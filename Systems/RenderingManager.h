@@ -1,0 +1,35 @@
+#pragma once
+
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <mutex>
+#include <queue>
+
+using std::mutex;
+namespace LunaticEngine {
+class RenderingManager {
+   public:
+    RenderingManager() = default;
+    // It's a singliton shit.
+    RenderingManager(const RenderingManager& another) = delete;
+    void operator=(const RenderingManager&) = delete;
+
+    void insertRenderCommandGroup(std::function<void()> commandGroupLambda);
+
+    /**
+     * @brief RenderTick is defined to be double buffer in the Render System.
+     */
+
+    void renderTick();
+    static RenderingManager& getManager();
+
+   
+    // We only hope the RenderingManager itself have its own life cycle.
+    static std::unique_ptr<RenderingManager> mRenderingManagerSingletonRef;
+
+   private:
+    std::queue<std::function<void()>> mCommandGroupQueue;
+};
+
+}  // namespace LunaticEngine
