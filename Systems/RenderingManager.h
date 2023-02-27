@@ -28,7 +28,7 @@ class RenderingManager {
     static std::unique_ptr<RenderingManager> mRenderingManagerSingletonRef;
 
     void swapRenderingQueue() {
-        // Using move trying to make it faster.
+        // Using move trying to make it faster. 
         mCommandGroupQueuePrev = std::move(mCommandGroupQueue);
     }
 
