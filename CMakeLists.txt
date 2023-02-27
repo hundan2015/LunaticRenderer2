@@ -7,11 +7,17 @@ include_directories("D:\\dev\\vcpkg\\installed\\x64-windows\\include")
 include(CTest)
 enable_testing()
 
+
 add_executable(TestProject main.cpp)
 find_package(glm CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_RUNTIME ON)
+find_package(Boost COMPONENTS system REQUIRED)
+
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
@@ -24,6 +30,7 @@ target_link_libraries(TestProject PUBLIC LIB_COMPONENT)
 target_link_libraries(TestProject PRIVATE glad::glad)
 target_link_libraries(TestProject PRIVATE glfw)
 target_link_libraries(TestProject PRIVATE imgui::imgui)
+#target_link_libraries(TestProject PRIVATE Boost)
 
 
 include(CPack)

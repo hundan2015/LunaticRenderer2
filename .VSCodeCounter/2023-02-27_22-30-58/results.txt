@@ -1,0 +1,44 @@
+Date : 2023-02-27 22:30:58
+Directory : d:\Programing\c++\CmakeProjects\TestProject
+Total : 15 files,  276 codes, 54 comments, 49 blanks, all 379 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |         11 |        243 |         53 |         37 |        333 |
+| CMake    |          3 |         31 |          1 |         10 |         42 |
+| Markdown |          1 |          2 |          0 |          2 |          4 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                      | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                         |         15 |        276 |         54 |         49 |        379 |
+| . (Files)                                                                 |          3 |         55 |          3 |         15 |         73 |
+| Components                                                                |          5 |         51 |          7 |          5 |         63 |
+| Systems                                                                   |          7 |        170 |         44 |         29 |        243 |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                  | language | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| d:\Programing\c++\CmakeProjects\TestProject\CMakeLists.txt                | CMake    |         26 |          1 |         10 |         37 |
+| d:\Programing\c++\CmakeProjects\TestProject\Components\CMakeLists.txt     | CMake    |          2 |          0 |          0 |          2 |
+| d:\Programing\c++\CmakeProjects\TestProject\Components\Component.h        | C++      |          7 |          0 |          0 |          7 |
+| d:\Programing\c++\CmakeProjects\TestProject\Components\Renderer.cpp       | C++      |         19 |          2 |          1 |         22 |
+| d:\Programing\c++\CmakeProjects\TestProject\Components\Renderer.h         | C++      |         18 |          1 |          4 |         23 |
+| d:\Programing\c++\CmakeProjects\TestProject\Components\RendererFactory.h  | C++      |          5 |          4 |          0 |          9 |
+| d:\Programing\c++\CmakeProjects\TestProject\Systems\CMakeLists.txt        | CMake    |          3 |          0 |          0 |          3 |
+| d:\Programing\c++\CmakeProjects\TestProject\Systems\ImguiComponent.h      | C++      |          7 |          0 |          0 |          7 |
+| d:\Programing\c++\CmakeProjects\TestProject\Systems\ImguiManager.h        | C++      |         26 |         11 |          5 |         42 |
+| d:\Programing\c++\CmakeProjects\TestProject\Systems\LunaticEngineBody.cpp | C++      |         67 |         25 |          8 |        100 |
+| d:\Programing\c++\CmakeProjects\TestProject\Systems\LunaticEngineBody.h   | C++      |         17 |          2 |          5 |         24 |
+| d:\Programing\c++\CmakeProjects\TestProject\Systems\RenderingManager.cpp  | C++      |         25 |          0 |          1 |         26 |
+| d:\Programing\c++\CmakeProjects\TestProject\Systems\RenderingManager.h    | C++      |         25 |          6 |         10 |         41 |
+| d:\Programing\c++\CmakeProjects\TestProject\main.cpp                      | C++      |         27 |          2 |          3 |         32 |
+| d:\Programing\c++\CmakeProjects\TestProject\note.md                       | Markdown |          2 |          0 |          2 |          4 |
+| Total                                                                     |          |        276 |         54 |         49 |        379 |
++---------------------------------------------------------------------------+----------+------------+------------+------------+------------+

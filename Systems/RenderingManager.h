@@ -24,12 +24,17 @@ class RenderingManager {
     void renderTick();
     static RenderingManager& getManager();
 
-   
     // We only hope the RenderingManager itself have its own life cycle.
     static std::unique_ptr<RenderingManager> mRenderingManagerSingletonRef;
 
+    void swapRenderingQueue() {
+        // Using move trying to make it faster.
+        mCommandGroupQueuePrev = std::move(mCommandGroupQueue);
+    }
+
    private:
     std::queue<std::function<void()>> mCommandGroupQueue;
+    std::queue<std::function<void()>> mCommandGroupQueuePrev;
 };
 
 }  // namespace LunaticEngine

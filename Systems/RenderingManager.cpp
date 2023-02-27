@@ -1,10 +1,10 @@
 #include "RenderingManager.h"
 void LunaticEngine::RenderingManager::renderTick() {
-    while (!mCommandGroupQueue.empty()) {
+    while (!mCommandGroupQueuePrev.empty()) {
         const std::function<void()>& commandGroupLambda =
-            mCommandGroupQueue.front();
+            mCommandGroupQueuePrev.front();
         commandGroupLambda();
-        mCommandGroupQueue.pop();
+        mCommandGroupQueuePrev.pop();
     }
 }
 void LunaticEngine::RenderingManager::insertRenderCommandGroup(
