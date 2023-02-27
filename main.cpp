@@ -9,10 +9,8 @@ using LunaticEngine::RenderingManager;
 int main(int, char**) {
     // RenderingManager::mRenderingManagerSingletonRef = nullptr;
     std::cout << "Hello, world?>Blade!\n";
-    std::cout << "Hello, world?>Blade!\n";
-    std::cout << "Hello, world?>Blade!\n";
-    std::cout << "Hello, world?>Blade!\n";
     LunaticEngine::LunaticEngineBody body(nullptr);
     body.startEngine();
+    
     return 0;
 }

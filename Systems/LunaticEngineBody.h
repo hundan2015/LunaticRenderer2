@@ -13,6 +13,7 @@ class LunaticEngineBody {
     // std::thread& mRenderingThread;
     void renderLoop();
     void logicLoop();
+    void initOpenGL();
     RenderingManager& mRenderingManager;
     GLFWwindow* mWindow;
 
