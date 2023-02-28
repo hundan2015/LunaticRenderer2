@@ -50,6 +50,8 @@ void LunaticEngine::LunaticEngineBody::startEngine() {
             std::cout << "Render OK\n";
 #endif
             renderingManager.swapRenderingQueue();
+
+            
         }
         // Using the arrive_and_drop to make sure the logicLoopDeco being
         // joined.

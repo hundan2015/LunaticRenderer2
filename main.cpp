@@ -11,6 +11,5 @@ int main(int, char**) {
     std::cout << "Hello, world?>Blade!\n";
     LunaticEngine::LunaticEngineBody body(nullptr);
     body.startEngine();
-    
     return 0;
 }
