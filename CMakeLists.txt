@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.0.0)
-set(CMAKE_TOOLCHAIN_FILE "D:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake")
+set(VCPKG_ROOT "D:/dev/vcpkg")
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+set(CMAKE_GENERATOR "Ninja")
 
 set(CMAKE_CXX_STANDARD 20)
 project(TestProject VERSION 0.1.0 LANGUAGES CXX)
-include_directories("D:\\dev\\vcpkg\\installed\\x64-windows\\include")
+include_directories("${VCPKG_ROOT}/installed/x64-windows/include")
 include(CTest)
 enable_testing()
 

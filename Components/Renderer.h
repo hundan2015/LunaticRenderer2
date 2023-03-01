@@ -32,18 +32,15 @@ class Renderer : Component {
     void onTick() override;
     void setShaderProgram(const unsigned int& shaderProgram);
     void onStart() override;
-    Renderer(unsigned int vao, unsigned int shaderProgram);
-    Renderer(unsigned int vao);
-    // Super shit design. Maybe we need the Reflaction!!
-    std::string toString() override {
-        std::string renderString = std::format()
-    };
+    // Renderer(unsigned int vao, unsigned int shaderProgram);
+    // Renderer(unsigned int vao);
+    //  Super shit design. Maybe we need the Reflaction!!
+    std::string toString() override;
     void stringSerial(std::string componentStr) override;
 
    private:
     bool mHasShaderProgram = false;
     std::shared_ptr<mesh_info> mMeshInfo;
 };
-
 
 }  // namespace LunaticEngine
