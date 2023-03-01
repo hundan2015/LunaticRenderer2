@@ -1,7 +1,12 @@
 #pragma once
+#include <format>
+#include <memory>
 #include <string>
+#include <set>
+#include <map>
+#include <typeinfo>
 namespace LunaticEngine {
-class Component {
+class ComponentOld {
    public:
     bool mEnabled = true;
     virtual void onTick();
@@ -9,4 +14,5 @@ class Component {
     virtual std::string toString();
     virtual void stringSerial(std::string componentStr);
 };
+
 }  // namespace LunaticEngine

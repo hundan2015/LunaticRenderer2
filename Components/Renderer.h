@@ -20,6 +20,7 @@ struct mesh_info {
 };
 class Material {
     friend Renderer;
+    std::string mMaterialSource;
     unsigned int mShaderProgram;
     // TODO:Finish the rendering system!
    public:
@@ -27,7 +28,7 @@ class Material {
     void setFLoat();
     void setUniform3x3();
 };
-class Renderer : Component {
+class Renderer : ComponentOld {
    public:
     void onTick() override;
     void setShaderProgram(const unsigned int& shaderProgram);
@@ -39,8 +40,8 @@ class Renderer : Component {
     void stringSerial(std::string componentStr) override;
 
    private:
-    bool mHasShaderProgram = false;
     std::shared_ptr<mesh_info> mMeshInfo;
+    std::shared_ptr<Material> mMaterial;
 };
 
 }  // namespace LunaticEngine

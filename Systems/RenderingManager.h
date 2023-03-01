@@ -9,6 +9,8 @@
 using std::mutex;
 namespace LunaticEngine {
 class RenderingManager {
+    /** TODO: A RenderingManager is not only the singliton but belong to a Engine
+     * Context.*/
    public:
     RenderingManager() = default;
     // It's a singliton shit.
@@ -28,7 +30,7 @@ class RenderingManager {
     static std::unique_ptr<RenderingManager> mRenderingManagerSingletonRef;
 
     void swapRenderingQueue() {
-        // Using move trying to make it faster. 
+        // Using move trying to make it faster.
         mCommandGroupQueuePrev = std::move(mCommandGroupQueue);
     }
 
