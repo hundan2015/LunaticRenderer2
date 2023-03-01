@@ -1,4 +1,5 @@
 #include "Renderer.h"
+
 #include <iostream>
 #define warnMessageLog(x) std::cout << "\033[31m" << (x) << std::endl
 void Renderer::setShaderProgram(const unsigned int& shaderProgram) {
