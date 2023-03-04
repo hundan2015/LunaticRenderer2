@@ -20,8 +20,8 @@ void LunaticEngine::Renderer::onTick() {
         // effect.
         glDrawArrays(GL_TRIANGLES, 0, mMeshInfo->mTriangleCount);
     };
-    RenderingManager& renderingManager = RenderingManager::getManager();
-    renderingManager.insertRenderCommandGroup(renderingCommand);
+    //RenderingManager& renderingManager = RenderingManager::getManager();
+    //renderingManager.insertRenderCommandGroup(renderingCommand);
 }
 
 // LunaticEngine::Renderer::Renderer(unsigned int vao) : mVao(vao) {}

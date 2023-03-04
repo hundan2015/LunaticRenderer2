@@ -1,9 +1,11 @@
 #pragma once
 #include <vcruntime_typeinfo.h>
 #include <algorithm>
+#include <cmath>
 #include <format>
 #include <iostream>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <set>
 #include <map>
@@ -11,24 +13,26 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <unordered_map>
+#include <utility>
 #include <vector>
-
-#define COMPONENT(x, y)                             \
-    class x {                                       \
-        friend void to_json(json& j, const x& p);   \
-        friend void from_json(const json& j, x& p); \
-        y                                           \
-    }
 
 using json = nlohmann::json;
 namespace LunaticEngine {
-
+template <typename T>
+class RegisterComponent {
+   public:
+    RegisterComponent() {
+        std::cout << typeid(T).name() << " has registered." << std::endl;
+    }
+};
+class Entity;
 class Component {
-    virtual void initComponent();
+    virtual void initComponent(){};
 
    public:
+    // std::shared_ptr<Entity> entity = nullptr;
     bool mEnabled = true;
-    template<typename T>
+    template <typename T>
     std::string toString() {
         json j = *static_cast<T*>(this);
         return j;
@@ -40,30 +44,45 @@ class Component {
         return result;
     }
 };
+
 class Entity {
    private:
-    std::map<std::string, std::shared_ptr<Component>> mComponents;
     std::string mName;
 
    public:
+    Entity() = default;
+    std::string getName() { return mName; }
+    bool isDirty = false;
+    std::map<std::string, std::shared_ptr<Component>> mComponents;
     template <typename T>
     const std::shared_ptr<T> getComponent() {
         std::string componentID = typeid(T).name();
         auto result = mComponents.find(componentID);
         if (result != mComponents.end()) {
-            return result->second;
+            return std::static_pointer_cast<T>(result->second);
         } else {
-            std::string errMessage =
-                std::format("ERROR::Entity {} have no {}", mName, componentID);
-            // TODO:Log error.
+            std::string errMessage = std::format(
+                "WARNING::Entity {} have no {}", mName, componentID);
+            // TODO:Log warning.
             return nullptr;
         }
+    }
+    template <typename T>
+    void addComponent(std::shared_ptr<T> component) {
+        std::shared_ptr<Component> componentTemp =
+            std::static_pointer_cast<Component>(component);
+        mComponents.insert(std::make_pair(typeid(T).name(), componentTemp));
+        // componentTemp->entity = std::make_shared<Entity>(this);
+        isDirty = true;
+    }
+    void removeComponent(std::string component) {
+        isDirty = true;
+        mComponents.erase(component);
     }
 };
 class System {
    protected:
-    std::unordered_map<std::string, Entity> mTargets;
-    std::vector<std::string> mRequiredComponents;
+    std::set<std::shared_ptr<Entity>> mTargets;
     void registerSystemToManager() {
         // Register to SystemManager.
         std::string systemName = typeid(*this).name();
@@ -84,8 +103,13 @@ class System {
     }
 
    public:
-    System() {
-        std::sort(mRequiredComponents.begin(), mRequiredComponents.end());
+    const std::string kName;
+    void registerToSystem(std::shared_ptr<Entity> entity) {
+        mTargets.insert(entity);
+    }
+    std::set<std::string> mRequiredComponents;
+    System(std::string name) : kName(name) {
+        // std::sort(mRequiredComponents.begin(), mRequiredComponents.end());
         std::string componentNameSeq = "";
         for (auto& componentName : mRequiredComponents) {
             componentNameSeq += ":" + componentName;
@@ -95,9 +119,9 @@ class System {
         // TODO: Take it to the static register tree.
     }
     int mHashCode;
-    virtual void onStart();
-    virtual void onTick(float deltaTime);
-    virtual void onDisabled();
+    virtual void onStart(){};
+    virtual void onTick(float deltaTime){};
+    virtual void onDisabled(){};
 };
 
 }  // namespace LunaticEngine

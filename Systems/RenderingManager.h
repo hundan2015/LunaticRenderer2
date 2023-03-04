@@ -24,6 +24,7 @@ class RenderingManager {
      */
 
     void renderTick();
+    // FIXME: Rendering Manager would no longer be a Singliton!
     static RenderingManager& getManager();
 
     // We only hope the RenderingManager itself have its own life cycle.
