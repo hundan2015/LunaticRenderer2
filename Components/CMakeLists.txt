@@ -9,3 +9,6 @@ target_link_libraries(LIB_COMPONENT PRIVATE glfw)
 
 add_executable(EntityManagerTest test/EntityManagerTest.cpp)
 target_link_libraries(EntityManagerTest PUBLIC LIB_COMPONENT)
+
+add_executable(RenderingSystemTest test/RenderingSystemTest.cpp)
+target_link_libraries(RenderingSystemTest PUBLIC LIB_COMPONENT)

@@ -18,6 +18,6 @@ int main() {
     // entityManager.entityList.insert(entity);
     entityManager.registerToSystem(entity1);
     // entityManager.manageEntity();
-    entityManager.deltaTime = std::make_shared<float>(1);
-    entityManager.logicalTick();
+    //entityManager.deltaTime = std::make_shared<float>(1);
+    entityManager.logicalTick(1);
 }

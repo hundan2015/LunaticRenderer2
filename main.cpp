@@ -9,7 +9,7 @@ using LunaticEngine::RenderingManager;
 int main(int, char**) {
     // RenderingManager::mRenderingManagerSingletonRef = nullptr;
     std::cout << "Hello, world?>Blade!\n";
-    LunaticEngine::LunaticEngineBody body(nullptr);
+    LunaticEngine::LunaticEngineBody body;
     body.startEngine();
     return 0;
 }

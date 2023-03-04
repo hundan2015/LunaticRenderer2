@@ -46,8 +46,30 @@ class RenderingSystem : public System {
         std::cout << "Rendering system is ticking." << std::endl;
         for (auto& entity : mTargets) {
             std::shared_ptr<Mesh> mesh = entity->getComponent<Mesh>();
-            std::shared_ptr<Transform> transform =
-                entity->getComponent<Transform>();
+            // Because an Entity have only a weak_ptr parent, which can't be
+            // nullptr. So I transfer it into the shared_ptr first.
+            std::shared_ptr<Entity> parent = entity->mParent.lock();
+            std::shared_ptr<Transform> transform;
+            if (parent == nullptr) {
+                transform = entity->getComponent<Transform>();
+            } else {
+                // transform = std::make_shared<Transform>();
+                auto getWorldTransform =
+                    [&](std::shared_ptr<Entity> lastEntity) {
+                        std::shared_ptr<Entity> parentEntity =
+                            lastEntity->mParent.lock();
+                        if (parentEntity == nullptr) {
+                            transform = std::make_shared<Transform>(
+                                *(lastEntity->getComponent<Transform>()));
+                            return;
+                        } else {
+                            // TODO:Do something to the transform.
+                            return;
+                        }
+                    };
+                getWorldTransform(parent);
+            }
+
             // Caculate Transform matrix.
             glm::mat4 transfromMat(1.0f);
             // Transfer the data to the shader.

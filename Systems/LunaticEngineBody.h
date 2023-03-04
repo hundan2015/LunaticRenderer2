@@ -1,24 +1,25 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <thread>
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "RenderingManager.h"
-
+#include "../Components/EntityManager.hpp"
 namespace LunaticEngine {
 class LunaticEngineBody {
-    // std::thread& mLogicThread;
-    // std::thread& mRenderingThread;
     void renderLoop();
     void logicLoop();
     void initOpenGL();
-    RenderingManager& mRenderingManager;
+    // RenderingManager& mRenderingManager;
+    std::shared_ptr<RenderingManager> mRenderingManager;
+    std::shared_ptr<EntityManager> mEntityManager;
     GLFWwindow* mWindow;
 
    public:
-    LunaticEngineBody(GLFWwindow* window);
+    LunaticEngineBody();
     void startEngine();
 };
 }  // namespace LunaticEngine

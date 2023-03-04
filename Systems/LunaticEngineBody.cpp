@@ -1,8 +1,10 @@
 #include <barrier>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <thread>
+#include <chrono>
 
 #include "LunaticEngineBody.h"
 #include "RenderingManager.h"
@@ -11,15 +13,19 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
 
+#include "../Systems/TestSystem.h"
+
 using std::barrier;
 void LunaticEngine::LunaticEngineBody::startEngine() {
-    initOpenGL();
     //  Fuck a main loop.
     auto endBar = []() noexcept {
 #ifdef DEBUG_BARRIER
         std::cout << "Frame Barrier reached." << std::endl;
 #endif
     };
+    float timeLast = std::chrono::duration_cast<std::chrono::microseconds>(
+                         std::chrono::system_clock::now().time_since_epoch())
+                         .count();
     bool isEngineShit = true;
     const int ENGINE_THREAD_COUNT = 2;
     barrier barEnd(ENGINE_THREAD_COUNT, endBar);
@@ -32,7 +38,13 @@ void LunaticEngine::LunaticEngineBody::startEngine() {
      */
     auto logicLoopDeco = [&]() {
         while (isEngineShit) {
-            logicLoop();
+            float timeNow =
+                std::chrono::duration_cast<std::chrono::microseconds>(
+                    std::chrono::system_clock::now().time_since_epoch())
+                    .count();
+            float deltaTime = (timeNow - timeLast) / 60;
+            // logicLoop();
+            mEntityManager->logicalTick(deltaTime);
             barEnd.arrive_and_wait();
         }
     };
@@ -50,8 +62,6 @@ void LunaticEngine::LunaticEngineBody::startEngine() {
             std::cout << "Render OK\n";
 #endif
             renderingManager.swapRenderingQueue();
-
-            
         }
         // Using the arrive_and_drop to make sure the logicLoopDeco being
         // joined.
@@ -68,11 +78,15 @@ void LunaticEngine::LunaticEngineBody::startEngine() {
     glfwTerminate();
 }
 
-LunaticEngine::LunaticEngineBody::LunaticEngineBody(GLFWwindow* window)
-    : mRenderingManager(RenderingManager::getManager()), mWindow(window) {}
+LunaticEngine::LunaticEngineBody::LunaticEngineBody() {
+    initOpenGL();
+    mEntityManager = std::make_shared<EntityManager>();
+    // mEntityManager->registerSystem(std::make_shared<TestSystem>());
+    mRenderingManager = std::make_shared<RenderingManager>();
+}
 
 void LunaticEngine::LunaticEngineBody::renderLoop() {
-    mRenderingManager.renderTick();
+    mRenderingManager->renderTick();
 }
 void LunaticEngine::LunaticEngineBody::logicLoop() {}
 void LunaticEngine::LunaticEngineBody::initOpenGL() {

@@ -50,6 +50,8 @@ class Entity {
     std::string mName;
 
    public:
+    std::weak_ptr<Entity> mParent;
+    std::vector<std::shared_ptr<Entity>> mChild;
     Entity() = default;
     std::string getName() { return mName; }
     bool isDirty = false;

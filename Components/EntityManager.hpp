@@ -16,7 +16,7 @@ class EntityManager {
 
 
    public:
-    std::shared_ptr<float> deltaTime;
+    //std::shared_ptr<float> deltaTime;
     std::map<std::string, std::shared_ptr<System>> systemList;
     std::set<std::shared_ptr<Entity>> entityList;
     std::queue<std::shared_ptr<Entity>> needToDestroy;
@@ -79,9 +79,9 @@ class EntityManager {
     }
     void destroy(std::shared_ptr<Entity> entity) { needToDestroy.push(entity); }
     void destroy(std::shared_ptr<Component> component) {}
-    void logicalTick() {
+    void logicalTick(float deltaTime) {
         for (auto &system : systemList) {
-            system.second->onTick(*deltaTime);
+            system.second->onTick(deltaTime);
         }
         manageEntity();
     }

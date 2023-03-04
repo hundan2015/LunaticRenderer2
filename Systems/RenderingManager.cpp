@@ -1,4 +1,5 @@
 #include "RenderingManager.h"
+
 void LunaticEngine::RenderingManager::renderTick() {
     while (!mCommandGroupQueuePrev.empty()) {
         const std::function<void()>& commandGroupLambda =
