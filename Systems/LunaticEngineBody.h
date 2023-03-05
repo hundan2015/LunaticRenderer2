@@ -14,9 +14,11 @@ class LunaticEngineBody {
     void logicLoop();
     void initOpenGL();
     // RenderingManager& mRenderingManager;
-    std::shared_ptr<RenderingManager> mRenderingManager;
+    std::shared_ptr<RenderingManager> mRenderingManager_;
     std::shared_ptr<EntityManager> mEntityManager;
     GLFWwindow* mWindow;
+
+    // std::shared_ptr<Entity> mainCamera_;
 
    public:
     LunaticEngineBody();

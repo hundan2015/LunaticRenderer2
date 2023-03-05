@@ -13,7 +13,7 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
 
-#include "../Systems/TestSystem.h"
+#include "../Components/TestSystem.h"
 
 using std::barrier;
 void LunaticEngine::LunaticEngineBody::startEngine() {
@@ -50,7 +50,7 @@ void LunaticEngine::LunaticEngineBody::startEngine() {
     };
 
     auto renderLoopDeco = [&]() {
-        RenderingManager& renderingManager = RenderingManager::getManager();
+        //RenderingManager& renderingManager = RenderingManager::getManager();
         while (isEngineShit && !glfwWindowShouldClose(mWindow)) {
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -61,7 +61,7 @@ void LunaticEngine::LunaticEngineBody::startEngine() {
 #ifdef DEBUG_BARRIER
             std::cout << "Render OK\n";
 #endif
-            renderingManager.swapRenderingQueue();
+            /* renderingManager.swapRenderingQueue(); */
         }
         // Using the arrive_and_drop to make sure the logicLoopDeco being
         // joined.
@@ -81,12 +81,12 @@ void LunaticEngine::LunaticEngineBody::startEngine() {
 LunaticEngine::LunaticEngineBody::LunaticEngineBody() {
     initOpenGL();
     mEntityManager = std::make_shared<EntityManager>();
-    // mEntityManager->registerSystem(std::make_shared<TestSystem>());
-    mRenderingManager = std::make_shared<RenderingManager>();
+    mEntityManager->registerSystem(std::make_shared<TestSystem>());
+    mRenderingManager_ = std::make_shared<RenderingManager>();
 }
 
 void LunaticEngine::LunaticEngineBody::renderLoop() {
-    mRenderingManager->renderTick();
+    mRenderingManager_->renderTick();
 }
 void LunaticEngine::LunaticEngineBody::logicLoop() {}
 void LunaticEngine::LunaticEngineBody::initOpenGL() {

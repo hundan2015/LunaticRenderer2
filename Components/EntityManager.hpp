@@ -13,23 +13,24 @@
 #include "EntityComponentSystem.hpp"
 namespace LunaticEngine {
 class EntityManager {
-
-
    public:
-    //std::shared_ptr<float> deltaTime;
-    std::map<std::string, std::shared_ptr<System>> systemList;
-    std::set<std::shared_ptr<Entity>> entityList;
-    std::queue<std::shared_ptr<Entity>> needToDestroy;
-    void registerToSystem(std::shared_ptr<Entity> entity) {
+    // std::shared_ptr<float> deltaTime;
+    std::map<std::string, std::shared_ptr<System>> mSystemList;
+    
+    std::set<std::shared_ptr<Entity>> mEntityList;
+    std::queue<std::shared_ptr<Entity>> mNeedToDestroy;
+    std::shared_ptr<Entity> mMainCamera;
+
+    void registerToSystem(const std::shared_ptr<Entity> &entity) {
         bool haveASystem = false;
-        for (auto &system : systemList) {
+        for (auto &system : mSystemList) {
             auto &systemMap = system.second->mRequiredComponents;
             std::set<std::string> entityHave;
             for (auto &component : entity->mComponents) {
                 std::cout << "Entity have:" << component.first << std::endl;
                 entityHave.insert(component.first);
             }
-            for (auto &component : systemMap) {
+            for (const auto &component : systemMap) {
                 std::cout << "System need:" << component << std::endl;
             }
             std::vector<std::string> res;
@@ -45,13 +46,13 @@ class EntityManager {
             }
         }
         if (!haveASystem) {
-            needToDestroy.push(entity);
+            mNeedToDestroy.push(entity);
         }
     }
-    void registerSystem(std::shared_ptr<System> systemPtr) {
-        auto iter = systemList.find(systemPtr->kName);
-        if (iter == systemList.end()) {
-            systemList.insert(std::make_pair(systemPtr->kName, systemPtr));
+    void registerSystem(const std::shared_ptr<System> &systemPtr) {
+        auto iter = mSystemList.find(systemPtr->kName);
+        if (iter == mSystemList.end()) {
+            mSystemList.insert(std::make_pair(systemPtr->kName, systemPtr));
         } else {
             std::string errmsg =
                 std::format("System {} has been registered.", systemPtr->kName);
@@ -60,27 +61,29 @@ class EntityManager {
     }
     // At end of loop
     void manageEntity() {
-        for (auto &entity : entityList) {
-            if (entity->isDirty) {
+        for (const auto &entity : mEntityList) {
+            if (entity->mIsDirty) {
                 registerToSystem(entity);
             }
         }
-        while (!needToDestroy.empty()) {
-            auto entityPtr = needToDestroy.front();
-            auto iter = entityList.find(entityPtr);
-            if (iter == entityList.end()) {
+        while (!mNeedToDestroy.empty()) {
+            auto entityPtr = mNeedToDestroy.front();
+            auto iter = mEntityList.find(entityPtr);
+            if (iter == mEntityList.end()) {
                 std::cout << "Shit!" << std::endl;
             }
-            std::cout << entityList.size() << std::endl;
-            entityList.erase(entityPtr);
-            std::cout << entityList.size() << std::endl;
-            needToDestroy.pop();
+            std::cout << mEntityList.size() << std::endl;
+            mEntityList.erase(entityPtr);
+            std::cout << mEntityList.size() << std::endl;
+            mNeedToDestroy.pop();
         }
     }
-    void destroy(std::shared_ptr<Entity> entity) { needToDestroy.push(entity); }
-    void destroy(std::shared_ptr<Component> component) {}
+    void destroy(const std::shared_ptr<Entity> &entity) {
+        mNeedToDestroy.push(entity);
+    }
+    void destroy(const std::shared_ptr<Component> &component) {}
     void logicalTick(float deltaTime) {
-        for (auto &system : systemList) {
+        for (auto &system : mSystemList) {
             system.second->onTick(deltaTime);
         }
         manageEntity();

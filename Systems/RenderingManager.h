@@ -6,18 +6,18 @@
 #include <mutex>
 #include <queue>
 
-using std::mutex;
 namespace LunaticEngine {
 class RenderingManager {
-    /** TODO: A RenderingManager is not only the singliton but belong to a Engine
-     * Context.*/
+    /** TODO: A RenderingManager is not only the singliton but belong to a
+     * Engine Context.*/
    public:
     RenderingManager() = default;
     // It's a singliton shit.
-    RenderingManager(const RenderingManager& another) = delete;
-    void operator=(const RenderingManager&) = delete;
+    //RenderingManager(const RenderingManager& another) = delete;
+    //void operator=(const RenderingManager&) = delete;
 
-    void insertRenderCommandGroup(std::function<void()> commandGroupLambda);
+    void insertRenderCommandGroup(
+        const std::function<void()>& commandGroupLambda);
 
     /**
      * @brief RenderTick is defined to be double buffer in the Render System.
@@ -25,19 +25,20 @@ class RenderingManager {
 
     void renderTick();
     // FIXME: Rendering Manager would no longer be a Singliton!
-    static RenderingManager& getManager();
+    //static RenderingManager& getManager();
+    //static std::shared_ptr<RenderingManager> getManagerPtr();
 
     // We only hope the RenderingManager itself have its own life cycle.
-    static std::unique_ptr<RenderingManager> mRenderingManagerSingletonRef;
+    static std::shared_ptr<RenderingManager> mRenderingManagerSingletonRef_;
 
     void swapRenderingQueue() {
         // Using move trying to make it faster.
-        mCommandGroupQueuePrev = std::move(mCommandGroupQueue);
+        mCommandGroupQueuePrev_ = std::move(mCommandGroupQueue_);
     }
 
    private:
-    std::queue<std::function<void()>> mCommandGroupQueue;
-    std::queue<std::function<void()>> mCommandGroupQueuePrev;
+    std::queue<std::function<void()>> mCommandGroupQueue_;
+    std::queue<std::function<void()>> mCommandGroupQueuePrev_;
 };
 
 }  // namespace LunaticEngine
