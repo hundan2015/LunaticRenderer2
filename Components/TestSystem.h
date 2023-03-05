@@ -4,11 +4,7 @@
 namespace LunaticEngine {
 class TestSystem : public System {
    public:
-    TestSystem() : System(typeid(TestSystem).name()) {
-        mRequiredComponents = {typeid(Transform).name()};
-    }
-    void onTick(float deltaTime) override {
-        std::cout << "TestSystem is ticking." << std::endl;
-    }
+    TestSystem();
+    void onTick(float deltaTime) override;
 };
 }  // namespace LunaticEngine

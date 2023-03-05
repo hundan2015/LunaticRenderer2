@@ -18,6 +18,7 @@
 
 using json = nlohmann::json;
 namespace LunaticEngine {
+class Entity;
 template <typename T>
 class RegisterComponent {
    public:
@@ -25,7 +26,6 @@ class RegisterComponent {
         std::cout << typeid(T).name() << " has registered." << std::endl;
     }
 };
-class Entity;
 class Component {
     virtual void initComponent(){};
 
@@ -34,40 +34,40 @@ class Component {
     bool mEnabled = true;
     template <typename T>
     std::string toString() {
-        json j = *static_cast<T*>(this);
-        return j;
+        json jsonObject = *static_cast<T*>(this);
+        return jsonObject;
     }
     template <typename T>
     std::shared_ptr<T> getComponentFromString(std::string componentStr) {
-        json j = json::parse(componentStr);
-        std::shared_ptr<T> result = std::make_shared<T>(j.get<T>());
+        json jsonObject = json::parse(componentStr);
+        std::shared_ptr<T> result = std::make_shared<T>(jsonObject.get<T>());
         return result;
     }
 };
 
 class Entity {
    private:
-    std::string mName;
+    std::string mName_;
 
    public:
     std::weak_ptr<Entity> mParent;
     std::vector<std::shared_ptr<Entity>> mChild;
+
     Entity() = default;
-    std::string getName() { return mName; }
-    bool isDirty = false;
+    std::string getName() { return mName_; }
+    bool mIsDirty = false;
     std::map<std::string, std::shared_ptr<Component>> mComponents;
     template <typename T>
-    const std::shared_ptr<T> getComponent() {
+    std::shared_ptr<T> getComponent() {
         std::string componentID = typeid(T).name();
         auto result = mComponents.find(componentID);
         if (result != mComponents.end()) {
             return std::static_pointer_cast<T>(result->second);
-        } else {
-            std::string errMessage = std::format(
-                "WARNING::Entity {} have no {}", mName, componentID);
-            // TODO:Log warning.
-            return nullptr;
         }
+        std::string errMessage =
+            std::format("WARNING::Entity {} have no {}", mName_, componentID);
+        // TODO(Symbolic): Log warning.
+        return nullptr;
     }
     template <typename T>
     void addComponent(std::shared_ptr<T> component) {
@@ -75,16 +75,16 @@ class Entity {
             std::static_pointer_cast<Component>(component);
         mComponents.insert(std::make_pair(typeid(T).name(), componentTemp));
         // componentTemp->entity = std::make_shared<Entity>(this);
-        isDirty = true;
+        mIsDirty = true;
     }
-    void removeComponent(std::string component) {
-        isDirty = true;
+    void removeComponent(const std::string& component) {
+        mIsDirty = true;
         mComponents.erase(component);
     }
 };
 class System {
    protected:
-    std::set<std::shared_ptr<Entity>> mTargets;
+    std::set<std::shared_ptr<Entity>> mTargets_;
     void registerSystemToManager() {
         // Register to SystemManager.
         std::string systemName = typeid(*this).name();
@@ -105,20 +105,21 @@ class System {
     }
 
    public:
+    int mPriority;
     const std::string kName;
-    void registerToSystem(std::shared_ptr<Entity> entity) {
-        mTargets.insert(entity);
+    void registerToSystem(const std::shared_ptr<Entity>& entity) {
+        mTargets_.insert(entity);
     }
     std::set<std::string> mRequiredComponents;
-    System(std::string name) : kName(name) {
+    explicit System(std::string name) : kName(std::move(name)) {
         // std::sort(mRequiredComponents.begin(), mRequiredComponents.end());
-        std::string componentNameSeq = "";
-        for (auto& componentName : mRequiredComponents) {
+        std::string componentNameSeq;
+        for (const auto& componentName : mRequiredComponents) {
             componentNameSeq += ":" + componentName;
         }
         std::hash<std::string> hashCode;
         mHashCode = static_cast<int>(hashCode(componentNameSeq));
-        // TODO: Take it to the static register tree.
+        // TODO(Symbolic): Take it to the static register tree.
     }
     int mHashCode;
     virtual void onStart(){};

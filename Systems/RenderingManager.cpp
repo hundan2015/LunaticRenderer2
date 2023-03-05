@@ -1,27 +1,34 @@
 #include "RenderingManager.h"
+#include <memory>
 
 void LunaticEngine::RenderingManager::renderTick() {
-    while (!mCommandGroupQueuePrev.empty()) {
+    while (!mCommandGroupQueuePrev_.empty()) {
         const std::function<void()>& commandGroupLambda =
-            mCommandGroupQueuePrev.front();
+            mCommandGroupQueuePrev_.front();
         commandGroupLambda();
-        mCommandGroupQueuePrev.pop();
+        mCommandGroupQueuePrev_.pop();
     }
 }
 void LunaticEngine::RenderingManager::insertRenderCommandGroup(
-    std::function<void()> commandGroupLambda) {
+    const std::function<void()>& commandGroupLambda) {
     static std::mutex locker;
     locker.lock();
-    mCommandGroupQueue.push(commandGroupLambda);
+    mCommandGroupQueue_.push(commandGroupLambda);
     locker.unlock();
 }
-LunaticEngine::RenderingManager& LunaticEngine::RenderingManager::getManager()
-{
-    if (mRenderingManagerSingletonRef == nullptr) {
-        mRenderingManagerSingletonRef = std::unique_ptr<RenderingManager>(new RenderingManager());
+/* LunaticEngine::RenderingManager& LunaticEngine::RenderingManager::getManager() {
+    if (mRenderingManagerSingletonRef_ == nullptr) {
+        mRenderingManagerSingletonRef_ = std::make_shared<RenderingManager>();
     }
-    return *mRenderingManagerSingletonRef;
+    return *mRenderingManagerSingletonRef_;
 }
+std::shared_ptr<LunaticEngine::RenderingManager>
+LunaticEngine::RenderingManager::getManagerPtr() {
+    if (mRenderingManagerSingletonRef_ == nullptr) {
+        mRenderingManagerSingletonRef_ = std::make_shared<RenderingManager>();
+    }
+    return std::make_shared<RenderingManager>(mRenderingManagerSingletonRef_);
+} */
 
-std::unique_ptr<LunaticEngine::RenderingManager>
-    LunaticEngine::RenderingManager::mRenderingManagerSingletonRef = nullptr;
+std::shared_ptr<LunaticEngine::RenderingManager>
+    LunaticEngine::RenderingManager::mRenderingManagerSingletonRef_ = nullptr;
