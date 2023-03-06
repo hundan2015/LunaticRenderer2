@@ -4,7 +4,7 @@
 #include <memory>
 #include "../TestSystem.h"
 #include "../RenderSystem.hpp"
-using namespace LunaticEngine;
+using namespace lunatic_engine;
 int main() {
     std::shared_ptr<EntityManager> entityManager;
     std::shared_ptr<Entity> entity1 = std::make_shared<Entity>();

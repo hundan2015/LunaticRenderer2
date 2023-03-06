@@ -6,9 +6,9 @@
 #include <mutex>
 #include <queue>
 
-namespace LunaticEngine {
+namespace lunatic_engine {
 class RenderingManager {
-    /** TODO: A RenderingManager is not only the singliton but belong to a
+    /** TODO: A RenderingManager is not only the singleton but belong to a
      * Engine Context.*/
    public:
     RenderingManager() = default;
@@ -24,7 +24,7 @@ class RenderingManager {
      */
 
     void renderTick();
-    // FIXME: Rendering Manager would no longer be a Singliton!
+    // FIXME: Rendering Manager would no longer be a Singleton!
     //static RenderingManager& getManager();
     //static std::shared_ptr<RenderingManager> getManagerPtr();
 
@@ -41,4 +41,4 @@ class RenderingManager {
     std::queue<std::function<void()>> mCommandGroupQueuePrev_;
 };
 
-}  // namespace LunaticEngine
+}  // namespace lunatic_engine

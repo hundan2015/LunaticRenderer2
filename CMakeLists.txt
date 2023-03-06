@@ -11,10 +11,10 @@ enable_testing()
 
 if(MSVC)
     # warning level 4 and all warnings as errors
-    add_compile_options(/W4 /WX)
+    add_compile_options(/W3 /WX)
 endif()
 
-add_executable(TestProject main.cpp)
+add_executable(TestProject main.cpp Systems/ImguiManager.h)
 find_package(glm CONFIG REQUIRED)
 
 # find_package(glfw3 CONFIG REQUIRED)

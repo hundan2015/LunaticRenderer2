@@ -17,7 +17,7 @@
 #include <vector>
 
 using json = nlohmann::json;
-namespace LunaticEngine {
+namespace lunatic_engine {
 class Entity;
 template <typename T>
 class RegisterComponent {
@@ -32,6 +32,7 @@ class Component {
    public:
     // std::shared_ptr<Entity> entity = nullptr;
     bool mEnabled = true;
+    std::string mName;
     template <typename T>
     std::string toString() {
         json jsonObject = *static_cast<T*>(this);
@@ -123,8 +124,8 @@ class System {
     }
     int mHashCode;
     virtual void onStart(){};
-    virtual void onTick(float deltaTime){};
+    virtual void onTick(float deltaTime){std::cout<<"Do nothing"<<deltaTime<<std::endl;};
     virtual void onDisabled(){};
 };
 
-}  // namespace LunaticEngine
+}  // namespace lunatic_engine

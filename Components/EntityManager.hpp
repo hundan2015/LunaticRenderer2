@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 #include "EntityComponentSystem.hpp"
-namespace LunaticEngine {
+namespace lunatic_engine {
 class EntityManager {
    public:
     // std::shared_ptr<float> deltaTime;
@@ -81,7 +81,9 @@ class EntityManager {
     void destroy(const std::shared_ptr<Entity> &entity) {
         mNeedToDestroy.push(entity);
     }
-    void destroy(const std::shared_ptr<Component> &component) {}
+    void destroy(Entity& entity,const std::shared_ptr<Component> &component) {
+        entity.removeComponent(component->mName);
+    }
     void logicalTick(float deltaTime) {
         for (auto &system : mSystemList) {
             system.second->onTick(deltaTime);
@@ -90,4 +92,4 @@ class EntityManager {
     }
 };
 // std::map<std::string, std::>
-}  // namespace LunaticEngine
+}  // namespace lunatic_engine

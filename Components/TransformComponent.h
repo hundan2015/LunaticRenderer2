@@ -6,7 +6,7 @@
 #include "EntityComponentSystem.hpp"
 #include <glm/glm.hpp>
 
-namespace LunaticEngine {
+namespace lunatic_engine {
 // Need a viewmodel of the Componnet.
 /**
  * @brief Transform store an Entity's position, rotation and scale information.
@@ -62,4 +62,4 @@ class TransformManager {
         transform.mScaleX = kScale.z;
     }
 };
-}  // namespace LunaticEngine
+}  // namespace lunatic_engine

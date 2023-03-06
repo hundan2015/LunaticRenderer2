@@ -10,7 +10,7 @@
 #include "glm/gtx/transform.hpp"
 #include <glm/gtc/quaternion.hpp>
 #include "TransformComponent.h"
-namespace LunaticEngine {
+namespace lunatic_engine {
 class MainCamera : public Component {};
 struct camera_context {
     static glm::mat4 mView_;
@@ -24,4 +24,4 @@ class CameraSystem : public System {
     CameraSystem();
     void onTick(float /*deltaTime*/) override;
 };
-}  // namespace LunaticEngine
+}  // namespace lunatic_engine

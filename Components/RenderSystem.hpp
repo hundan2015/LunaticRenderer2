@@ -17,7 +17,7 @@
 #include "glad/glad.h"
 using json = nlohmann::json;
 // TODO(Symbolic): Remade the directory!!!!
-namespace LunaticEngine {
+namespace lunatic_engine {
 class RenderingManager;
 class Mesh : public Component {
    private:
@@ -147,5 +147,5 @@ class RenderingSystem : public System {
         }
     }
     void onDisabled() override {}
-};  // namespace LunaticEngine
-}  // namespace LunaticEngine
+};  // namespace lunatic_engine
+}  // namespace lunatic_engine

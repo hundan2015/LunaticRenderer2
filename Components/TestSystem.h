@@ -1,10 +1,10 @@
 #pragma once
 #include "EntityComponentSystem.hpp"
 #include "TransformComponent.h"
-namespace LunaticEngine {
+namespace lunatic_engine {
 class TestSystem : public System {
    public:
     TestSystem();
     void onTick(float deltaTime) override;
 };
-}  // namespace LunaticEngine
+}  // namespace lunatic_engine

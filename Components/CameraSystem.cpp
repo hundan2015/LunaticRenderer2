@@ -1,6 +1,6 @@
 #include "CameraSystem.h"
 
-namespace LunaticEngine {
+namespace lunatic_engine {
 
 
 void CameraSystem::onTick(float /*deltaTime*/) {
@@ -26,4 +26,4 @@ void CameraSystem::onTick(float /*deltaTime*/) {
 CameraSystem::CameraSystem() : System(typeid(CameraSystem).name()) {
     mRequiredComponents = {typeid(MainCamera).name(), typeid(Transform).name()};
 }
-}  // namespace LunaticEngine
+}  // namespace lunatic_engine

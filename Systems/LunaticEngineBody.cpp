@@ -1,58 +1,56 @@
+#include "LunaticEngineBody.h"
+
 #include <barrier>
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <thread>
-#include <chrono>
 
-#include "LunaticEngineBody.h"
+#include "../Components/TestSystem.h"
 #include "RenderingManager.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
 
-#include "../Components/TestSystem.h"
-
 using std::barrier;
-void LunaticEngine::LunaticEngineBody::startEngine() {
+void lunatic_engine::LunaticEngineBody::startEngine() const {
     //  Fuck a main loop.
     auto endBar = []() noexcept {
 #ifdef DEBUG_BARRIER
         std::cout << "Frame Barrier reached." << std::endl;
 #endif
     };
-    float timeLast = std::chrono::duration_cast<std::chrono::microseconds>(
-                         std::chrono::system_clock::now().time_since_epoch())
-                         .count();
+    const float timeLast = static_cast<float>(glfwGetTime());
     bool isEngineShit = true;
-    const int ENGINE_THREAD_COUNT = 2;
+    constexpr int ENGINE_THREAD_COUNT = 2;
     barrier barEnd(ENGINE_THREAD_COUNT, endBar);
     /**
-     * @brief HACK:Here is a super imbarrasment shit from barrier in cpp20. This
-     * section need a barrier to sync three thread. But the barrier can't be
-     * used as a class member. So I use two decoration lambda and two while
+     * @brief HACK:Here is a super embarrassment shit from barrier in cpp20.
+     * This section need a barrier to sync three thread. But the barrier can't
+     * be used as a class member. So I use two decoration lambda and two while
      * loop to use the barrier. Therefore the barrier can't be accessed by the
      * function outside.
      */
     auto logicLoopDeco = [&]() {
         while (isEngineShit) {
-            float timeNow =glfwGetTime();
-            float deltaTime = (timeNow - timeLast) / 60;
+            const auto timeNow = static_cast<float>(glfwGetTime());
+            const float deltaTime = (timeNow - timeLast) / 60;
             // logicLoop();
-            mEntityManager->logicalTick(deltaTime);
+            mEntityManager_->logicalTick(deltaTime);
             barEnd.arrive_and_wait();
         }
     };
 
     auto renderLoopDeco = [&]() {
-        //RenderingManager& renderingManager = RenderingManager::getManager();
-        while (isEngineShit && !glfwWindowShouldClose(mWindow)) {
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        // RenderingManager& renderingManager = RenderingManager::getManager();
+        while (isEngineShit && !glfwWindowShouldClose(mWindow_)) {
+            glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             renderLoop();
-            glfwSwapBuffers(mWindow);
+            glfwSwapBuffers(mWindow_);
             glfwPollEvents();
             barEnd.arrive_and_wait();
 #ifdef DEBUG_BARRIER
@@ -75,31 +73,31 @@ void LunaticEngine::LunaticEngineBody::startEngine() {
     glfwTerminate();
 }
 
-LunaticEngine::LunaticEngineBody::LunaticEngineBody() {
+lunatic_engine::LunaticEngineBody::LunaticEngineBody() {
     initOpenGL();
-    mEntityManager = std::make_shared<EntityManager>();
-    mEntityManager->registerSystem(std::make_shared<TestSystem>());
+    mEntityManager_ = std::make_shared<EntityManager>();
+    mEntityManager_->registerSystem(std::make_shared<TestSystem>());
     mRenderingManager_ = std::make_shared<RenderingManager>();
 }
 
-void LunaticEngine::LunaticEngineBody::renderLoop() {
+void lunatic_engine::LunaticEngineBody::renderLoop() const {
     mRenderingManager_->renderTick();
 }
-void LunaticEngine::LunaticEngineBody::logicLoop() {}
-void LunaticEngine::LunaticEngineBody::initOpenGL() {
+void lunatic_engine::LunaticEngineBody::logicLoop() {}
+void lunatic_engine::LunaticEngineBody::initOpenGL() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    mWindow = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-    if (mWindow == NULL) {
+    mWindow_ = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
+    if (mWindow_ == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return;
     }
-    glfwMakeContextCurrent(mWindow);
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    glfwMakeContextCurrent(mWindow_);
+    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return;
     }

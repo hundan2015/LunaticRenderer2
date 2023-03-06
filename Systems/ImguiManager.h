@@ -12,7 +12,7 @@
 
 using std::map;
 using std::string;
-namespace LunaticEngine {
+namespace lunatic_engine {
 class ImguiManager {
    public:
     /**
@@ -38,4 +38,4 @@ class ImguiManager {
     map<string, ImguiComponent> mComponentMap;
 };
 
-}  // namespace LunaticEngine
+}  // namespace lunatic_engine
