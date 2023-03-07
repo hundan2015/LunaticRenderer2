@@ -11,8 +11,8 @@ target_link_libraries(LIB_COMPONENT PRIVATE glad::glad)
 target_link_libraries(LIB_COMPONENT PRIVATE glfw)
 target_link_libraries(LIB_COMPONENT PRIVATE lunatic_core)
 
-add_executable(EntityManagerTest test/EntityManagerTest.cpp ../../editor/ImguiManager.h)
+add_executable(EntityManagerTest ../../../test/EntityManagerTest.cpp ../../editor/ImguiManager.h)
 target_link_libraries(EntityManagerTest PUBLIC LIB_COMPONENT)
 
-add_executable(RenderingSystemTest test/RenderingSystemTest.cpp ../../editor/ImguiManager.h)
+add_executable(RenderingSystemTest ../../../test/RenderingSystemTest.cpp ../../editor/ImguiManager.h)
 target_link_libraries(RenderingSystemTest PUBLIC LIB_COMPONENT)

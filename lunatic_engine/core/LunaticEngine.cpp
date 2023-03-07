@@ -9,16 +9,16 @@
 #include <thread>
 
 #include "../function/Components/TestSystem.h"
-#include "RenderingManager.h"
+#include "RenderingCore.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_internal.h"
 
 using std::barrier;
-void lunatic_engine::LunaticEngine::startEngine() const {
+void lunatic_engine::LunaticEngine::StartEngine() const {
     //  Fuck a main loop.
-    auto endBar = []() noexcept {
+    auto endbar = []() noexcept {
 #ifdef DEBUG_BARRIER
         std::cout << "Frame Barrier reached." << std::endl;
 #endif
@@ -26,7 +26,7 @@ void lunatic_engine::LunaticEngine::startEngine() const {
     float time_last = static_cast<float>(glfwGetTime());
     bool is_engine_shit = true;
     constexpr int kEngineThreadCount = 2;
-    barrier bar_end(kEngineThreadCount, endBar);
+    barrier bar_end(kEngineThreadCount, endbar);
     /**
      * @brief HACK:Here is a super embarrassment shit from barrier in cpp20.
      * This section need a barrier to sync three thread. But the barrier can't
@@ -34,70 +34,70 @@ void lunatic_engine::LunaticEngine::startEngine() const {
      * loop to use the barrier. Therefore the barrier can't be accessed by the
      * function outside.
      */
-    auto logicLoopDeco = [&]() {
+    auto logic_loop_deco = [&]() {
         while (is_engine_shit) {
             const auto time_now = static_cast<float>(glfwGetTime());
             const float delta_time = (time_now - time_last) / 60;
             time_last = time_now;
-            // logicLoop();
-            mEntityManager_->logicalTick(delta_time);
+            // LogicLoop();
+            entity_manager_->LogicalTick(delta_time);
             bar_end.arrive_and_wait();
         }
     };
 
-    auto renderLoopDeco = [&]() {
-        // RenderingManager& renderingManager = RenderingManager::getManager();
-        while (is_engine_shit && !glfwWindowShouldClose(mWindow_)) {
+    auto render_loop_deco = [&]() {
+        // RenderingCore& renderingManager = RenderingCore::getManager();
+        while (is_engine_shit && !glfwWindowShouldClose(window_)) {
             glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             renderLoop();
-            glfwSwapBuffers(mWindow_);
+            glfwSwapBuffers(window_);
             glfwPollEvents();
             bar_end.arrive_and_wait();
 #ifdef DEBUG_BARRIER
             std::cout << "Render OK\n";
 #endif
-            /* renderingManager.swapRenderingQueue(); */
+            /* renderingManager.SwapRenderingQueue(); */
         }
-        // Using the arrive_and_drop to make sure the logicLoopDeco being
+        // Using the arrive_and_drop to make sure the logic_loop_deco being
         // joined.
         bar_end.arrive_and_drop();
         is_engine_shit = false;
     };
 
-    std::thread logicThread(logicLoopDeco);
+    std::thread logicThread(logic_loop_deco);
     // HACK: The openGL render thread can only run in main loop! I don't know
     // why!
-    renderLoopDeco();
+    render_loop_deco();
     // renderThread.join();
     logicThread.join();
     glfwTerminate();
 }
 
 lunatic_engine::LunaticEngine::LunaticEngine() {
-    initOpenGL();
-    mEntityManager_ = std::make_shared<EntityManager>();
-    mEntityManager_->registerSystem(std::make_shared<TestSystem>());
-    mRenderingManager_ = std::make_shared<RenderingManager>();
+    InitOpenGL();
+    entity_manager_ = std::make_shared<EntityManager>();
+    entity_manager_->RegisterSystem(std::make_shared<TestSystem>());
+    rendering_manager_ = std::make_shared<RenderingCore>();
 }
 
 void lunatic_engine::LunaticEngine::renderLoop() const {
-    mRenderingManager_->renderTick();
+    rendering_manager_->RenderTick();
 }
-void lunatic_engine::LunaticEngine::logicLoop() {}
-void lunatic_engine::LunaticEngine::initOpenGL() {
+void lunatic_engine::LunaticEngine::LogicLoop() {}
+void lunatic_engine::LunaticEngine::InitOpenGL() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    mWindow_ = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
-    if (mWindow_ == nullptr) {
+    window_ = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
+    if (window_ == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return;
     }
-    glfwMakeContextCurrent(mWindow_);
+    glfwMakeContextCurrent(window_);
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return;

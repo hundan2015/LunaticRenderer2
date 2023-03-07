@@ -22,8 +22,8 @@ Total : 15 files,  276 codes, 54 comments, 49 blanks, all 379 lines
 | [Systems/ImguiManager.h](/lunatic_engine/editor/ImguiManager.h) | C++ | 26 | 11 | 5 | 42 |
 | [Systems/LunaticEngine.cpp](/lunatic_engine/core/LunaticEngine.cpp) | C++ | 67 | 25 | 8 | 100 |
 | [Systems/LunaticEngine.h](/lunatic_engine/core/LunaticEngine.h) | C++ | 17 | 2 | 5 | 24 |
-| [Systems/RenderingManager.cpp](/lunatic_engine/core/RenderingManager.cpp) | C++ | 25 | 0 | 1 | 26 |
-| [Systems/RenderingManager.h](/lunatic_engine/core/RenderingManager.h) | C++ | 25 | 6 | 10 | 41 |
+| [Systems/RenderingCore.cpp](/lunatic_engine/core/RenderingCore.cpp) | C++ | 25 | 0 | 1 | 26 |
+| [Systems/RenderingCore.h](/lunatic_engine/core/RenderingCore.h) | C++ | 25 | 6 | 10 | 41 |
 | [main.cpp](/lunatic_engine/main.cpp) | C++ | 27 | 2 | 3 | 32 |
 | [note.md](/doc/note.md) | Markdown | 2 | 0 | 2 | 4 |
 

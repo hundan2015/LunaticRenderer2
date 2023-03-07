@@ -7,9 +7,9 @@
 classDiagram
     shit ..> Entity
     class Entity {
-        - string mName_
-        + weak_ptr<Entity> mParent
-        + vector<shared_ptr<Entity>> mChild
+        - string name_
+        + weak_ptr<Entity> parent
+        + vector<shared_ptr<Entity>> child
         + weak_ptr<EntityManager> mEntityManager
     }
 

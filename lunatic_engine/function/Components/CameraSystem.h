@@ -21,6 +21,6 @@ glm::mat4 CameraContext::view_ = glm::mat4(1);
 class CameraSystem : public System {
    public:
     CameraSystem();
-    void onTick(float /*deltaTime*/) override;
+    void OnTick(float /*deltaTime*/) override;
 };
 }  // namespace lunatic_engine

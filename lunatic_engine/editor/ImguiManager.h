@@ -21,21 +21,21 @@ class ImguiManager {
      * @param component The component need to register.
      * @return string The component's `uuid` in the manager's map.
      */
-    string registerComponent(ImguiComponent& component) {
+    string RegisterComponent(ImguiComponent& component) {
         string uuid = "";
         // Using the move function to make sure the Component could be handled
         // by the componentMap.
-        mComponentMap.insert(std::make_pair(uuid, std::move(component)));
+        component_map_.insert(std::make_pair(uuid, std::move(component)));
         return uuid;
     }
-    void tick() {
+    void Tick() {
         /* std::for_each(
-            mComponentMap.begin(), mComponentMap.end(),
-            [](ImguiComponent& tempComponent) { tempComponent.onTick(); }); */
+            component_map_.begin(), component_map_.end(),
+            [](ImguiComponent& tempComponent) { tempComponent.OnTick(); }); */
     }
 
    private:
-    map<string, ImguiComponent> mComponentMap;
+    map<string, ImguiComponent> component_map_;
 };
 
 }  // namespace lunatic_engine

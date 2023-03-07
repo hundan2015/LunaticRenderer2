@@ -5,6 +5,6 @@ namespace lunatic_engine {
 class TestSystem : public System {
    public:
     TestSystem();
-    void onTick(float deltaTime) override;
+    void OnTick(float deltaTime) override;
 };
 }  // namespace lunatic_engine

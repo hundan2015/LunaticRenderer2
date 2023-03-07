@@ -8,22 +8,22 @@
 
 #include "../function/Components/EntityManager.hpp"
 #include "GLFW/glfw3.h"
-#include "RenderingManager.h"
+#include "RenderingCore.h"
 
 namespace lunatic_engine {
 class LunaticEngine {
     void renderLoop() const;
-    static void logicLoop();
-    void initOpenGL();
-    // RenderingManager& mRenderingManager;
-    std::shared_ptr<RenderingManager> mRenderingManager_;
-    std::shared_ptr<EntityManager> mEntityManager_;
-    GLFWwindow* mWindow_{};
+    static void LogicLoop();
+    void InitOpenGL();
+    // RenderingCore& mRenderingManager;
+    std::shared_ptr<RenderingCore> rendering_manager_;
+    std::shared_ptr<EntityManager> entity_manager_;
+    GLFWwindow* window_{};
 
     // std::shared_ptr<Entity> mainCamera_;
 
    public:
     LunaticEngine();
-    void startEngine() const;
+    void StartEngine() const;
 };
 }  // namespace lunatic_engine

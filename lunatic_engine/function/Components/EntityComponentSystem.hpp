@@ -27,46 +27,46 @@ class RegisterComponent {
     }
 };
 class Component {
-    virtual void initComponent(){};
+    virtual void InitComponent(){};
 
    public:
     // std::shared_ptr<Entity> entity = nullptr;
-    bool mEnabled = true;
-    std::string mName;
+    bool enabled = true;
+    std::string name;
     template <typename T>
     std::string toString() {
-        json jsonObject = *static_cast<T*>(this);
-        return jsonObject;
+        json json_object = *static_cast<T*>(this);
+        return json_object;
     }
     template <typename T>
     std::shared_ptr<T> getComponentFromString(std::string componentStr) {
-        json jsonObject = json::parse(componentStr);
-        std::shared_ptr<T> result = std::make_shared<T>(jsonObject.get<T>());
+        json json_object = json::parse(componentStr);
+        std::shared_ptr<T> result = std::make_shared<T>(json_object.get<T>());
         return result;
     }
 };
 
 class Entity {
    private:
-    std::string mName_;
+    std::string name_;
 
    public:
-    std::weak_ptr<Entity> mParent;
-    std::vector<std::shared_ptr<Entity>> mChild;
+    std::weak_ptr<Entity> parent;
+    std::vector<std::shared_ptr<Entity>> child;
 
     Entity() = default;
-    std::string getName() { return mName_; }
-    bool mIsDirty = false;
+    std::string GetName() { return name_; }
+    bool is_dirty = false;
     std::map<std::string, std::shared_ptr<Component>> mComponents;
     template <typename T>
     std::shared_ptr<T> getComponent() {
-        std::string componentID = typeid(T).name();
-        auto result = mComponents.find(componentID);
+        std::string component_id = typeid(T).name();
+        auto result = mComponents.find(component_id);
         if (result != mComponents.end()) {
             return std::static_pointer_cast<T>(result->second);
         }
         std::string errMessage =
-            std::format("WARNING::Entity {} have no {}", mName_, componentID);
+            std::format("WARNING::Entity {} have no {}", name_, component_id);
         // TODO(Symbolic): Log warning.
         return nullptr;
     }
@@ -76,10 +76,10 @@ class Entity {
             std::static_pointer_cast<Component>(component);
         mComponents.insert(std::make_pair(typeid(T).name(), componentTemp));
         // componentTemp->entity = std::make_shared<Entity>(this);
-        mIsDirty = true;
+        is_dirty = true;
     }
-    void removeComponent(const std::string& component) {
-        mIsDirty = true;
+    void RemoveComponent(const std::string& component) {
+        is_dirty = true;
         mComponents.erase(component);
     }
 };
@@ -111,11 +111,11 @@ class System {
     void registerToSystem(const std::shared_ptr<Entity>& entity) {
         mTargets_.insert(entity);
     }
-    std::set<std::string> mRequiredComponents;
+    std::set<std::string> required_components;
     explicit System(std::string name) : kName(std::move(name)) {
-        // std::sort(mRequiredComponents.begin(), mRequiredComponents.end());
+        // std::sort(required_components.begin(), required_components.end());
         std::string componentNameSeq;
-        for (const auto& componentName : mRequiredComponents) {
+        for (const auto& componentName : required_components) {
             componentNameSeq += ":" + componentName;
         }
         std::hash<std::string> hashCode;
@@ -123,11 +123,11 @@ class System {
         // TODO(Symbolic): Take it to the static register tree.
     }
     int mHashCode;
-    virtual void onStart(){};
-    virtual void onTick(float deltaTime) {
+    virtual void OnStart(){};
+    virtual void OnTick(float deltaTime) {
         std::cout << "Do nothing" << deltaTime << std::endl;
     };
-    virtual void onDisabled(){};
+    virtual void OnDisabled(){};
 };
 
 }  // namespace lunatic_engine

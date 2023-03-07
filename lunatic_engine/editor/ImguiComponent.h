@@ -1,5 +1,5 @@
 #pragma once
-namespace LunaticEngine {
+namespace lunatic_engine {
 class ImguiComponent {
    public:
     virtual void onTick();

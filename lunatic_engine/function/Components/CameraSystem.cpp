@@ -2,27 +2,29 @@
 
 namespace lunatic_engine {
 
-void CameraSystem::onTick(float /*deltaTime*/) {
+void CameraSystem::OnTick(float /*deltaTime*/) {
     for (const auto &entity : mTargets_) {
-        std::shared_ptr<MainCamera> mainCamera =
+        std::shared_ptr<MainCamera> main_camera =
             entity->getComponent<MainCamera>();
         std::shared_ptr<Transform> transform =
             entity->getComponent<Transform>();
         glm::vec3 position = glm::vec3(
-            transform->mPositonX, transform->mPositonY, transform->mPositonZ);
+            transform->position_x, transform->position_y, transform->position_z);
         glm::qua<float> rotation =
-            glm::qua<float>(transform->mRotationQw, transform->mRotationQx,
-                            transform->mRotationQy, transform->mRotationQz);
-        glm::vec3 upVector = rotation * glm::vec3(0, 1, 0);
-        glm::vec3 rightVector = rotation * glm::vec3(1, 0, 0);
-        glm::vec3 frontVector = rotation * glm::vec3(0, 0, 1);
+            glm::qua<float>(transform->rotation_w, transform->rotation_x,
+                            transform->rotation_y, transform->rotation_z);
+        glm::vec3 up_vector = rotation * glm::vec3(0, 1, 0);
+        glm::vec3 right_vector = rotation * glm::vec3(1, 0, 0);
+        glm::vec3 front_vector = rotation * glm::vec3(0, 0, 1);
 
+        // The View matrix of the MVP.
+        // TODO: The camera context can have more.
         CameraContext::view_ =
-            glm::lookAt(rightVector, upVector, frontVector) *
-            glm::translate(position);
+            glm::lookAt(right_vector, up_vector, front_vector) *
+            glm::translate(-position);
     }
 }
 CameraSystem::CameraSystem() : System(typeid(CameraSystem).name()) {
-    mRequiredComponents = {typeid(MainCamera).name(), typeid(Transform).name()};
+    required_components = {typeid(MainCamera).name(), typeid(Transform).name()};
 }
 }  // namespace lunatic_engine

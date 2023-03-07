@@ -4,12 +4,12 @@
 #define DEBUG_BARRIER
 #include "core/LunaticEngine.h"
 
-using lunatic_engine::RenderingManager;
+using lunatic_engine::RenderingCore;
 // void im_gui_render_function(GLFWwindow* window);
 int main(int, char**) {
-    // RenderingManager::mRenderingManagerSingletonRef = nullptr;
+    // RenderingCore::mRenderingManagerSingletonRef = nullptr;
     std::cout << "Hello, world?>Blade!\n";
     lunatic_engine::LunaticEngine body;
-    body.startEngine();
+    body.StartEngine();
     return 0;
 }
