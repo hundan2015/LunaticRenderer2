@@ -3,11 +3,11 @@
 namespace lunatic_engine {
 
 void CameraSystem::OnTick(float /*deltaTime*/) {
-    for (const auto &entity : mTargets_) {
+    for (const auto &entity : targets_) {
         std::shared_ptr<MainCamera> main_camera =
-            entity->getComponent<MainCamera>();
+            entity->GetComponent<MainCamera>();
         std::shared_ptr<Transform> transform =
-            entity->getComponent<Transform>();
+            entity->GetComponent<Transform>();
         glm::vec3 position = glm::vec3(
             transform->position_x, transform->position_y, transform->position_z);
         glm::qua<float> rotation =

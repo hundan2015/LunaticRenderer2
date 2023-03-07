@@ -1,6 +1,6 @@
 #pragma once
-#include "EntityComponentSystem.hpp"
-#include "TransformComponent.h"
+#include "../Components/Transform.h"
+#include "../System.hpp"
 namespace lunatic_engine {
 class TestSystem : public System {
    public:

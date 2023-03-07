@@ -1,9 +1,11 @@
 #include <iostream>
 #include <memory>
-#include "../lunatic_engine/function/Components/EntityComponentSystem.hpp"
-#include "../lunatic_engine/function/Components/EntityManager.hpp"
-#include "../lunatic_engine/function/Components/RenderSystem.hpp"
-#include "../lunatic_engine/function/Components/TestSystem.h"
+#include "../lunatic_engine/function/EntityManager.hpp"
+#include "../lunatic_engine/function/System.hpp"
+#include "../lunatic_engine/function/Systems/RenderSystem.hpp"
+#include "../lunatic_engine/function/Systems/TestSystem.h"
+#include "Entity.hpp"
+#include "Mesh.hpp"
 using namespace lunatic_engine;
 int main() {
     std::shared_ptr<EntityManager> entityManager;

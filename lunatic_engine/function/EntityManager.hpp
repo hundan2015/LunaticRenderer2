@@ -11,8 +11,10 @@
 #include <set>
 #include <utility>
 #include <vector>
-#include "EntityComponentSystem.hpp"
-
+#include "Component.hpp"
+#include "Entity.hpp"
+#include "System.hpp"
+using json = nlohmann::json;
 namespace lunatic_engine {
 class EntityManager {
    public:
@@ -25,10 +27,13 @@ class EntityManager {
 
     void RegisterToSystem(const std::shared_ptr<Entity> &entity) {
         bool have_a_system = false;
+        /**
+         * It's using the string set to compare.
+         */
         for (auto &system : system_list) {
             auto &system_map = system.second->required_components;
             std::set<std::string> entity_have;
-            for (auto &component : entity->mComponents) {
+            for (auto &component : entity->components) {
                 std::cout << "Entity have:" << component.first << std::endl;
                 entity_have.insert(component.first);
             }
@@ -40,7 +45,7 @@ class EntityManager {
                                         system_map.begin(), system_map.end(),
                                         std::back_inserter(res));
             if (res.empty()) {
-                system.second->registerToSystem(entity);
+                system.second->RegisterToSystem(entity);
                 std::cout << "Entity " << entity->GetName()
                           << " has registered to " << system.second->kName
                           << std::endl;
@@ -57,8 +62,7 @@ class EntityManager {
         if (iter == system_list.end()) {
             system_list.insert(std::make_pair(system_ptr->kName, system_ptr));
         } else {
-            std::string errmsg =
-                std::format("System {} has been registered.",
+            std::string errmsg = std::format("System {} has been registered.",
                                              system_ptr->kName);
             std::cout << errmsg << std::endl;
         }

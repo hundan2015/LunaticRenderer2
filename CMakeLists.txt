@@ -30,7 +30,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 set(DCMAKE_EXPORT_COMPILE_COMMANDS ON)
-add_subdirectory("lunatic_engine/function/Components")
+add_subdirectory("lunatic_engine/function/Systems")
 add_subdirectory("./lunatic_engine/core")
 
 # add_subdirectory("./GTestTest")

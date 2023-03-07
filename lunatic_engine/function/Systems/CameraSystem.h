@@ -5,8 +5,9 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 #include <memory>
-#include "EntityComponentSystem.hpp"
-#include "TransformComponent.h"
+#include "../Component.hpp"
+#include "../Components/Transform.h"
+#include "../System.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/glm.hpp"
 namespace lunatic_engine {
