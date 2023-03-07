@@ -2,7 +2,6 @@
 
 namespace lunatic_engine {
 
-
 void CameraSystem::onTick(float /*deltaTime*/) {
     for (const auto &entity : mTargets_) {
         std::shared_ptr<MainCamera> mainCamera =
@@ -18,7 +17,7 @@ void CameraSystem::onTick(float /*deltaTime*/) {
         glm::vec3 rightVector = rotation * glm::vec3(1, 0, 0);
         glm::vec3 frontVector = rotation * glm::vec3(0, 0, 1);
 
-        camera_context::mView_ =
+        CameraContext::view_ =
             glm::lookAt(rightVector, upVector, frontVector) *
             glm::translate(position);
     }

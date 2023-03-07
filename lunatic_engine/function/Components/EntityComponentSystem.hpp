@@ -4,14 +4,14 @@
 #include <cmath>
 #include <format>
 #include <iostream>
-#include <memory>
-#include <ostream>
-#include <string>
-#include <set>
 #include <map>
-#include <typeinfo>
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
+#include <ostream>
+#include <set>
+#include <string>
+#include <typeinfo>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -124,7 +124,9 @@ class System {
     }
     int mHashCode;
     virtual void onStart(){};
-    virtual void onTick(float deltaTime){std::cout<<"Do nothing"<<deltaTime<<std::endl;};
+    virtual void onTick(float deltaTime) {
+        std::cout << "Do nothing" << deltaTime << std::endl;
+    };
     virtual void onDisabled(){};
 };
 

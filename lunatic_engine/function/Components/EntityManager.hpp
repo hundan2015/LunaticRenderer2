@@ -1,4 +1,5 @@
 #pragma once
+
 #include <algorithm>
 #include <format>
 #include <iostream>
@@ -11,12 +12,13 @@
 #include <utility>
 #include <vector>
 #include "EntityComponentSystem.hpp"
+
 namespace lunatic_engine {
 class EntityManager {
    public:
     // std::shared_ptr<float> deltaTime;
     std::map<std::string, std::shared_ptr<System>> mSystemList;
-    
+
     std::set<std::shared_ptr<Entity>> mEntityList;
     std::queue<std::shared_ptr<Entity>> mNeedToDestroy;
     std::shared_ptr<Entity> mMainCamera;
@@ -49,6 +51,7 @@ class EntityManager {
             mNeedToDestroy.push(entity);
         }
     }
+
     void registerSystem(const std::shared_ptr<System> &systemPtr) {
         auto iter = mSystemList.find(systemPtr->kName);
         if (iter == mSystemList.end()) {
@@ -59,6 +62,7 @@ class EntityManager {
             std::cout << errmsg << std::endl;
         }
     }
+
     // At end of loop
     void manageEntity() {
         for (const auto &entity : mEntityList) {
@@ -78,12 +82,15 @@ class EntityManager {
             mNeedToDestroy.pop();
         }
     }
+
     void destroy(const std::shared_ptr<Entity> &entity) {
         mNeedToDestroy.push(entity);
     }
-    void destroy(Entity& entity,const std::shared_ptr<Component> &component) {
+
+    void destroy(Entity &entity, const std::shared_ptr<Component> &component) {
         entity.removeComponent(component->mName);
     }
+
     void logicalTick(float deltaTime) {
         for (auto &system : mSystemList) {
             system.second->onTick(deltaTime);

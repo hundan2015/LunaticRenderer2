@@ -9,12 +9,12 @@ include_directories("${VCPKG_ROOT}/installed/x64-windows/include")
 include(CTest)
 enable_testing()
 
-if(MSVC)
+if (MSVC)
     # warning level 4 and all warnings as errors
     add_compile_options(/W3 /WX)
-endif()
+endif ()
 
-add_executable(TestProject main.cpp Systems/ImguiManager.h)
+add_executable(TestProject lunatic_engine/main.cpp lunatic_engine/editor/ImguiManager.h)
 find_package(glm CONFIG REQUIRED)
 
 # find_package(glfw3 CONFIG REQUIRED)
@@ -30,11 +30,11 @@ find_package(nlohmann_json CONFIG REQUIRED)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 set(DCMAKE_EXPORT_COMPILE_COMMANDS ON)
-add_subdirectory("./Components")
-add_subdirectory("./Systems")
+add_subdirectory("lunatic_engine/function/Components")
+add_subdirectory("./lunatic_engine/core")
 
 # add_subdirectory("./GTestTest")
-target_link_libraries(TestProject PUBLIC systems)
+target_link_libraries(TestProject PUBLIC lunatic_core)
 target_link_libraries(TestProject PUBLIC LIB_COMPONENT)
 
 # target_link_libraries(TestProject PRIVATE glad::glad)

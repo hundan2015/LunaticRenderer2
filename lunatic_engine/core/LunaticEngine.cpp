@@ -1,4 +1,4 @@
-#include "LunaticEngineBody.h"
+#include "LunaticEngine.h"
 
 #include <barrier>
 #include <chrono>
@@ -8,7 +8,7 @@
 #include <mutex>
 #include <thread>
 
-#include "../Components/TestSystem.h"
+#include "../function/Components/TestSystem.h"
 #include "RenderingManager.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -16,17 +16,17 @@
 #include "imgui_internal.h"
 
 using std::barrier;
-void lunatic_engine::LunaticEngineBody::startEngine() const {
+void lunatic_engine::LunaticEngine::startEngine() const {
     //  Fuck a main loop.
     auto endBar = []() noexcept {
 #ifdef DEBUG_BARRIER
         std::cout << "Frame Barrier reached." << std::endl;
 #endif
     };
-    const float timeLast = static_cast<float>(glfwGetTime());
-    bool isEngineShit = true;
-    constexpr int ENGINE_THREAD_COUNT = 2;
-    barrier barEnd(ENGINE_THREAD_COUNT, endBar);
+    float time_last = static_cast<float>(glfwGetTime());
+    bool is_engine_shit = true;
+    constexpr int kEngineThreadCount = 2;
+    barrier bar_end(kEngineThreadCount, endBar);
     /**
      * @brief HACK:Here is a super embarrassment shit from barrier in cpp20.
      * This section need a barrier to sync three thread. But the barrier can't
@@ -35,24 +35,25 @@ void lunatic_engine::LunaticEngineBody::startEngine() const {
      * function outside.
      */
     auto logicLoopDeco = [&]() {
-        while (isEngineShit) {
-            const auto timeNow = static_cast<float>(glfwGetTime());
-            const float deltaTime = (timeNow - timeLast) / 60;
+        while (is_engine_shit) {
+            const auto time_now = static_cast<float>(glfwGetTime());
+            const float delta_time = (time_now - time_last) / 60;
+            time_last = time_now;
             // logicLoop();
-            mEntityManager_->logicalTick(deltaTime);
-            barEnd.arrive_and_wait();
+            mEntityManager_->logicalTick(delta_time);
+            bar_end.arrive_and_wait();
         }
     };
 
     auto renderLoopDeco = [&]() {
         // RenderingManager& renderingManager = RenderingManager::getManager();
-        while (isEngineShit && !glfwWindowShouldClose(mWindow_)) {
+        while (is_engine_shit && !glfwWindowShouldClose(mWindow_)) {
             glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             renderLoop();
             glfwSwapBuffers(mWindow_);
             glfwPollEvents();
-            barEnd.arrive_and_wait();
+            bar_end.arrive_and_wait();
 #ifdef DEBUG_BARRIER
             std::cout << "Render OK\n";
 #endif
@@ -60,8 +61,8 @@ void lunatic_engine::LunaticEngineBody::startEngine() const {
         }
         // Using the arrive_and_drop to make sure the logicLoopDeco being
         // joined.
-        barEnd.arrive_and_drop();
-        isEngineShit = false;
+        bar_end.arrive_and_drop();
+        is_engine_shit = false;
     };
 
     std::thread logicThread(logicLoopDeco);
@@ -73,18 +74,18 @@ void lunatic_engine::LunaticEngineBody::startEngine() const {
     glfwTerminate();
 }
 
-lunatic_engine::LunaticEngineBody::LunaticEngineBody() {
+lunatic_engine::LunaticEngine::LunaticEngine() {
     initOpenGL();
     mEntityManager_ = std::make_shared<EntityManager>();
     mEntityManager_->registerSystem(std::make_shared<TestSystem>());
     mRenderingManager_ = std::make_shared<RenderingManager>();
 }
 
-void lunatic_engine::LunaticEngineBody::renderLoop() const {
+void lunatic_engine::LunaticEngine::renderLoop() const {
     mRenderingManager_->renderTick();
 }
-void lunatic_engine::LunaticEngineBody::logicLoop() {}
-void lunatic_engine::LunaticEngineBody::initOpenGL() {
+void lunatic_engine::LunaticEngine::logicLoop() {}
+void lunatic_engine::LunaticEngine::initOpenGL() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);

@@ -6,12 +6,12 @@
 // The glad must be front of the GLFW.
 #include "glad/glad.h"
 
-#include "../Components/EntityManager.hpp"
+#include "../function/Components/EntityManager.hpp"
 #include "GLFW/glfw3.h"
 #include "RenderingManager.h"
 
 namespace lunatic_engine {
-class LunaticEngineBody {
+class LunaticEngine {
     void renderLoop() const;
     static void logicLoop();
     void initOpenGL();
@@ -23,7 +23,7 @@ class LunaticEngineBody {
     // std::shared_ptr<Entity> mainCamera_;
 
    public:
-    LunaticEngineBody();
+    LunaticEngine();
     void startEngine() const;
 };
 }  // namespace lunatic_engine

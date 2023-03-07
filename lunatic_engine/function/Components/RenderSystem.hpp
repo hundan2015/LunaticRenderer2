@@ -1,20 +1,20 @@
 #pragma once
 #include <vcruntime_typeinfo.h>
-#include "EntityComponentSystem.hpp"
 #include <glm/fwd.hpp>
 #include <iostream>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <ostream>
-#include "TransformComponent.h"
-#include "EntityManager.hpp"
+#include "../../core/RenderingManager.h"
 #include "CameraSystem.h"
+#include "EntityComponentSystem.hpp"
+#include "EntityManager.hpp"
+#include "TransformComponent.h"
+#include "glad/glad.h"
 #include "glm/detail/type_quat.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/transform.hpp"
-#include "../Systems/RenderingManager.h"
-#include "glad/glad.h"
 using json = nlohmann::json;
 // TODO(Symbolic): Remade the directory!!!!
 namespace lunatic_engine {
@@ -130,7 +130,7 @@ class RenderingSystem : public System {
                 transform->mScaleX, transform->mScaleY, transform->mScaleZ));
             auto model = transformMat * scaleMat * rotationMat;
             // Transfer the data to the shader.
-            glm::mat4 view = camera_context::mView_;
+            glm::mat4 view = camera_context::view_;
             glm::mat4 perspective = camera_context::mPerspective_;
             auto finalMat = perspective * view * model;
 

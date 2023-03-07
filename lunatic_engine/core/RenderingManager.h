@@ -22,7 +22,6 @@ class RenderingManager {
     /**
      * @brief RenderTick is defined to be double buffer in the Render System.
      */
-
     void renderTick();
     // FIXME: Rendering Manager would no longer be a Singleton!
     //static RenderingManager& getManager();
