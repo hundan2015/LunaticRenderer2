@@ -1,19 +1,20 @@
 #pragma once
 #include <vcruntime_typeinfo.h>
 #include <glm/fwd.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <ostream>
 #include "../../core/RenderingCore.h"
-#include "../Component.hpp"
 #include "../Components/Material.hpp"
 #include "../Components/Mesh.hpp"
 #include "../Components/Transform.h"
-#include "../Entity.hpp"
-#include "../EntityManager.hpp"
-#include "../System.hpp"
+#include "../Core/Component.hpp"
+#include "../Core/Entity.hpp"
+#include "../Core/EntityManager.hpp"
+#include "../Core/System.hpp"
 #include "CameraSystem.h"
 #include "glad/glad.h"
 #include "glm/detail/type_quat.hpp"
@@ -22,8 +23,6 @@
 using json = nlohmann::json;
 // TODO(Symbolic): Remade the directory!!!!
 namespace lunatic_engine {
-
-
 
 class RenderingSystem : public System {
     std::shared_ptr<Transform>& GetTransformFromParent(
@@ -71,6 +70,7 @@ class RenderingSystem : public System {
             std::shared_ptr<Mesh> mesh = entity->GetComponent<Mesh>();
             std::shared_ptr<Material> material =
                 entity->GetComponent<Material>();
+
             // Because an Entity have only a weak_ptr parent, which can't be
             // nullptr. So I transfer it into the shared_ptr first.
             std::shared_ptr<Entity> parent = entity->parent.lock();
@@ -120,9 +120,14 @@ class RenderingSystem : public System {
             // Maybe the rendering function should belong to the rendering core?
             auto rendering_function = [=]() {
                 glUseProgram(material->shader_content->shader_program);
+                int mat_mvp_location = glGetUniformLocation(
+                    material->shader_content->shader_program, "mat_mvp");
+                glUniformMatrix4fv(mat_mvp_location, 1, GL_FALSE,
+                                   glm::value_ptr(final_mat));
                 material->SetMaterial();
                 glBindVertexArray(mesh->mesh_content->vao);
-                glDrawElements(GL_TRIANGLES, mesh->mesh_content->triangle_count,
+                glDrawElements(GL_TRIANGLES,
+                               mesh->mesh_content->triangle_count * 3,
                                GL_UNSIGNED_INT, nullptr);
                 glBindVertexArray(0);
             };

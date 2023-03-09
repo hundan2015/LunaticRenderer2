@@ -58,7 +58,7 @@ class System {
         targets_.insert(entity);
     }
     std::set<std::string> required_components;
-    bool IsEntityEnabled(std::shared_ptr<Entity> entity) {
+    bool IsEntityEnabled(const std::shared_ptr<Entity>& entity) const {
         return entity->TestIsEnabled(required_components);
     }
     explicit System(std::string name) : kName(std::move(name)) {

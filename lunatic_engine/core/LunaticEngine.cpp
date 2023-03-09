@@ -10,8 +10,9 @@
 
 using std::barrier;
 void lunatic_engine::LunaticEngine::StartEngine() const {
+    rendering_core_->InitOpenGL();
     //  Fuck a main loop.
-    auto endbar = []() noexcept {
+    auto end_bar = []() noexcept {
 #ifdef DEBUG_BARRIER
         std::cout << "Frame Barrier reached." << std::endl;
 #endif
@@ -19,7 +20,7 @@ void lunatic_engine::LunaticEngine::StartEngine() const {
     auto time_last = static_cast<float>(glfwGetTime());
     bool is_engine_shit = true;
     constexpr int kEngineThreadCount = 2;
-    barrier bar_end(kEngineThreadCount, endbar);
+    barrier bar_end(kEngineThreadCount, end_bar);
     /**
      * @brief HACK:Here is a super embarrassment shit from barrier in cpp20.
      * This section need a barrier to sync three thread. But the barrier can't
@@ -64,7 +65,7 @@ void lunatic_engine::LunaticEngine::StartEngine() const {
 }
 
 lunatic_engine::LunaticEngine::LunaticEngine() {
-    rendering_core_->InitOpenGL();
+    //
     entity_manager_ = std::make_shared<EntityManager>();
     entity_manager_->RegisterSystem(std::make_shared<TestSystem>());
     rendering_core_ = std::make_shared<RenderingCore>();

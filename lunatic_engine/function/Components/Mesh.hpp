@@ -8,10 +8,11 @@
 #include <nlohmann/json_fwd.hpp>
 #include <ostream>
 #include "../../core/RenderingCore.h"
-#include "../Component.hpp"
-#include "../EntityManager.hpp"
-#include "../System.hpp"
+#include "../Core/Component.hpp"
+#include "../Core/EntityManager.hpp"
+#include "../Core/System.hpp"
 #include "../Systems/CameraSystem.h"
+#include "../core/content/MeshContent.h"
 #include "Transform.h"
 #include "glad/glad.h"
 #include "glm/detail/type_quat.hpp"

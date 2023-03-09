@@ -4,7 +4,7 @@
 #include <memory>
 #include <thread>
 // The glad must be front of the GLFW.
-#include "../function/EntityManager.hpp"
+#include "../function/Core/EntityManager.hpp"
 #include "RenderingCore.h"
 
 namespace lunatic_engine {

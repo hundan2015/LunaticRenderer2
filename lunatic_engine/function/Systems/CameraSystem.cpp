@@ -8,8 +8,9 @@ void CameraSystem::OnTick(float /*deltaTime*/) {
             entity->GetComponent<MainCamera>();
         std::shared_ptr<Transform> transform =
             entity->GetComponent<Transform>();
-        glm::vec3 position = glm::vec3(
-            transform->position_x, transform->position_y, transform->position_z);
+        glm::vec3 position =
+            glm::vec3(transform->position_x, transform->position_y,
+                      transform->position_z);
         glm::qua<float> rotation =
             glm::qua<float>(transform->rotation_w, transform->rotation_x,
                             transform->rotation_y, transform->rotation_z);
@@ -27,4 +28,6 @@ void CameraSystem::OnTick(float /*deltaTime*/) {
 CameraSystem::CameraSystem() : System(typeid(CameraSystem).name()) {
     required_components = {typeid(MainCamera).name(), typeid(Transform).name()};
 }
+glm::mat4 CameraContext::perspective_ = glm::mat4(1);
+glm::mat4 CameraContext::view_ = glm::mat4(1);
 }  // namespace lunatic_engine

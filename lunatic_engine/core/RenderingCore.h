@@ -12,19 +12,6 @@
 #include "GLFW/glfw3.h"
 
 namespace lunatic_engine {
-class MeshContent {
-   public:
-    unsigned int vao;
-    unsigned int triangle_count;
-};
-class ShaderContent {
-   public:
-    unsigned int shader_program;
-};
-class ImageContent{
-   public:
-    unsigned int image;
-};
 class RenderingCore {
    public:
     RenderingCore() = default;
@@ -42,6 +29,13 @@ class RenderingCore {
     }
     void InsertRenderCommandGroup(
         const std::function<void()>& command_group_lambda);
+    void InsertResoureCommandGroup(
+        const std::function<void()>& resource_command_group_lambda) {
+        static std::mutex locker;
+        locker.lock();
+        resource_command_group_queue_.push(resource_command_group_lambda);
+        locker.unlock();
+    }
 
     /**
      * @brief RenderTick is defined to be double buffer in the Render System.
@@ -57,7 +51,11 @@ class RenderingCore {
     }
 
    private:
+    std::mutex command_lock_;
+    std::mutex command_prev_lock_;
+    std::mutex resource_command_lock_;
     std::queue<std::function<void()>> command_group_queue_;
+    std::queue<std::function<void()>> resource_command_group_queue_;
     std::queue<std::function<void()>> command_group_queuePrev_;
 };
 

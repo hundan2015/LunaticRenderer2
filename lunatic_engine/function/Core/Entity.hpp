@@ -37,7 +37,7 @@ class Entity {
         if (result != components.end()) {
             return std::static_pointer_cast<T>(result->second);
         }
-        std::string errMessage =
+        std::string err_message =
             std::format("WARNING::Entity {} have no {}", name_, component_id);
         // TODO(Symbolic): Log warning.
         return nullptr;

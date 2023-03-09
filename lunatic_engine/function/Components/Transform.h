@@ -3,8 +3,8 @@
 #include <nlohmann/detail/macro_scope.hpp>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
-#include "../Component.hpp"
-#include "../System.hpp"
+#include "../Core/Component.hpp"
+#include "../Core/System.hpp"
 #include "glm/fwd.hpp"
 
 namespace lunatic_engine {

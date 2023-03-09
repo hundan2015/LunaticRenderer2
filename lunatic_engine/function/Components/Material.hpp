@@ -8,11 +8,14 @@
 #include <nlohmann/json_fwd.hpp>
 #include <ostream>
 #include "../../core/RenderingCore.h"
-#include "../Component.hpp"
-#include "../EntityManager.hpp"
-#include "../System.hpp"
+#include "../Core/Component.hpp"
+#include "../Core/EntityManager.hpp"
+#include "../Core/System.hpp"
 #include "../Systems/CameraSystem.h"
+#include "../../core/content/MeshContent.h"
 #include "Mesh.hpp"
+#include "../../core/content/ShaderContent.h"
+#include "../../core/content/ImageContent.h"
 #include "Transform.h"
 #include "glad/glad.h"
 #include "glm/detail/type_quat.hpp"
@@ -21,11 +24,16 @@
 namespace lunatic_engine {
 class Material : public Component {
    public:
-    std::string shader_dir;
+    std::string shader_vs_dir;
+    std::string shader_fs_dir;
     std::shared_ptr<lunatic_engine::ShaderContent> shader_content;
     std::map<std::string, std::string> name_dir_map;
-    std::map<std::string, lunatic_engine::ImageContent> dir_image_content_map;
-    void SetMaterial() {}
+    std::map<std::string, lunatic_engine::ImageContent> name_image_content_map;
+    void SetMaterial() {
+        for (auto &pair : name_image_content_map) {
+
+        }
+    }
 };
 }  // namespace lunatic_engine
 

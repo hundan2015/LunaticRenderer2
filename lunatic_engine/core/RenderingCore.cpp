@@ -4,21 +4,41 @@
 void lunatic_engine::RenderingCore::RenderTick() {
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    resource_command_lock_.lock();
+    while (!resource_command_group_queue_.empty()) {
+        std::cout << "Have a resource request!\n";
+        const std::function<void()>& resource_command_group_lambda =
+            resource_command_group_queue_.front();
+        resource_command_group_lambda();
+        resource_command_group_queue_.pop();
+    }
+    resource_command_lock_.unlock();
+    command_prev_lock_.lock();
     while (!command_group_queuePrev_.empty()) {
+        resource_command_lock_.lock();
+        while (!resource_command_group_queue_.empty()) {
+            std::cout << "Have a resource request!\n";
+            const std::function<void()>& resource_command_group_lambda =
+                resource_command_group_queue_.front();
+            resource_command_group_lambda();
+            resource_command_group_queue_.pop();
+        }
+        resource_command_lock_.unlock();
         const std::function<void()>& command_group_lambda =
             command_group_queuePrev_.front();
         command_group_lambda();
         command_group_queuePrev_.pop();
     }
+    command_prev_lock_.unlock();
     glfwSwapBuffers(window_);
     glfwPollEvents();
 }
 void lunatic_engine::RenderingCore::InsertRenderCommandGroup(
     const std::function<void()>& command_group_lambda) {
-    static std::mutex locker;
-    locker.lock();
+    command_lock_.lock();
     command_group_queue_.push(command_group_lambda);
-    locker.unlock();
+    command_lock_.unlock();
 }
 
 std::shared_ptr<lunatic_engine::RenderingCore>
