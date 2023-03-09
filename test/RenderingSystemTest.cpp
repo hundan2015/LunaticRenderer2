@@ -16,22 +16,6 @@ int main() {
     std::thread tick_thread([&]() {
         // rendering_core->InsertRenderCommandGroup(render_command_test);
         {
-            /*unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-            glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-            glCompileShader(vertexShader);
-
-            unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-            glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-            glCompileShader(fragmentShader);
-
-            unsigned int shaderProgram = glCreateProgram();
-            glAttachShader(shaderProgram, vertexShader);
-            glAttachShader(shaderProgram, fragmentShader);
-            glLinkProgram(shaderProgram);
-
-            glDeleteShader(vertexShader);
-            glDeleteShader(fragmentShader);*/
-
             float vertices[] = {
                 0.5f,  0.5f,  0.0f,  // top right
                 0.5f,  -0.5f, 0.0f,  // bottom right
@@ -99,6 +83,9 @@ int main() {
 
             std::shared_ptr<lunatic_engine::Transform> transform_ptr =
                 std::make_shared<lunatic_engine::Transform>();
+            transform_ptr->scale_x = 1;
+            transform_ptr->scale_y = 1;
+            transform_ptr->scale_z = 1;
 
             std::shared_ptr<lunatic_engine::Entity> entity =
                 std::make_shared<lunatic_engine::Entity>();
@@ -110,6 +97,10 @@ int main() {
                 std::make_shared<lunatic_engine::MainCamera>();
             std::shared_ptr<lunatic_engine::Transform> transform_ptr2 =
                 std::make_shared<lunatic_engine::Transform>();
+            transform_ptr2->scale_x = 1;
+            transform_ptr2->scale_y = 1;
+            transform_ptr2->scale_z = 1;
+
             transform_ptr2->position_z = 1;
             std::shared_ptr<lunatic_engine::Entity> camera =
                 std::make_shared<lunatic_engine::Entity>();

@@ -115,7 +115,9 @@ class RenderingSystem : public System {
             auto model = transform_mat * scale_mat * rotation_mat;
             // Transfer the data to the shader.
             glm::mat4 view = CameraContext::view_;
-            glm::mat4 perspective = CameraContext::perspective_;
+            // glm::mat4 perspective = CameraContext::perspective_;
+            glm::mat4 perspective = glm::perspective(
+                glm::radians(45.0f), (float)800 / (float)600, 0.1f, 100.0f);
             auto final_mat = perspective * view * model;
             // Maybe the rendering function should belong to the rendering core?
             auto rendering_function = [=]() {

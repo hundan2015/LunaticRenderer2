@@ -14,15 +14,16 @@ void CameraSystem::OnTick(float /*deltaTime*/) {
         glm::qua<float> rotation =
             glm::qua<float>(transform->rotation_w, transform->rotation_x,
                             transform->rotation_y, transform->rotation_z);
-        glm::vec3 up_vector = rotation * glm::vec3(0, 1, 0);
-        glm::vec3 right_vector = rotation * glm::vec3(1, 0, 0);
-        glm::vec3 front_vector = rotation * glm::vec3(0, 0, 1);
+        glm::vec3 up_vector = glm::mat3_cast(rotation) * glm::vec3(0, 1, 0);
+        glm::vec3 right_vector = glm::mat3_cast(rotation) * glm::vec3(1, 0, 0);
+        glm::vec3 front_vector = glm::mat3_cast(rotation) * glm::vec3(0, 0, 1);
 
         // The View matrix of the MVP.
         // TODO: The camera context can have more.
         CameraContext::view_ =
-            glm::lookAt(right_vector, up_vector, front_vector) *
-            glm::translate(-position);
+            glm::lookAt(glm::vec3(0, 0.0, 1), glm::vec3(0.0, -0.1, 0.0),
+                        glm::vec3(0.0, 1.0, 0.0));
+        // glm::lookAt(front_vector, up_vector, front_vector);
     }
 }
 CameraSystem::CameraSystem() : System(typeid(CameraSystem).name()) {
