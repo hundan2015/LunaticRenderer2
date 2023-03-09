@@ -1,7 +1,11 @@
-#pragma once
+﻿#pragma once
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
 #include <iostream>
 #include <sstream>
 #include "RenderingCore.h"
+#include "content/MeshContent.h"
 #include "content/ShaderContent.h"
 #include "fstream"
 #include "glad/glad.h"
@@ -39,12 +43,12 @@ class ResourceCore {
             const char* shit2 = fragment_shader_source.c_str();
             glShaderSource(vertexShader, 1, &shit1, nullptr);
             glCompileShader(vertexShader);
-            checkCompileErrors(vertexShader, "VERTEX");
+            CheckCompileErrors(vertexShader, "VERTEX");
 
             unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
             glShaderSource(fragmentShader, 1, &shit2, nullptr);
             glCompileShader(fragmentShader);
-            checkCompileErrors(fragmentShader, "FRAGMENT");
+            CheckCompileErrors(fragmentShader, "FRAGMENT");
 
             shaderProgram = glCreateProgram();
             glAttachShader(shaderProgram, vertexShader);
@@ -64,7 +68,7 @@ class ResourceCore {
         shader_content->shader_program = shaderProgram;
         return shader_content;
     }
-    void checkCompileErrors(GLuint shader, std::string type) {
+    void CheckCompileErrors(GLuint shader, std::string type) {
         GLint success;
         GLchar infoLog[1024];
         if (type != "PROGRAM") {
@@ -91,6 +95,10 @@ class ResourceCore {
                     << std::endl;
             }
         }
+    }
+    // TODO: Make a GetMeshContent method，
+    lunatic_engine::MeshContent GetMeshContent(std::string model_path) {
+        return MeshContent();
     }
 };
 

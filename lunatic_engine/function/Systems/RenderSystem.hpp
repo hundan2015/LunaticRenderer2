@@ -52,14 +52,14 @@ class RenderingSystem : public System {
         required_components = {typeid(Mesh).name(), typeid(Transform).name()};
     }
     explicit RenderingSystem(
-        const std::shared_ptr<RenderingCore>& renderingManagerPtr)
+        const std::shared_ptr<RenderingCore>& rendering_core_ptr)
         : System(typeid(RenderingSystem).name()) {
         required_components = {typeid(Mesh).name(), typeid(Transform).name(),
                                typeid(Material).name()};
-        mRenderingManager = renderingManagerPtr;
+        rendering_core = rendering_core_ptr;
     }
-    std::weak_ptr<EntityManager> mEntityManager;
-    std::weak_ptr<RenderingCore> mRenderingManager;
+    std::weak_ptr<EntityManager> entity_manager;
+    std::weak_ptr<RenderingCore> rendering_core;
 
     void OnStart() override {}
 
@@ -75,6 +75,11 @@ class RenderingSystem : public System {
             // nullptr. So I transfer it into the shared_ptr first.
             std::shared_ptr<Entity> parent = entity->parent.lock();
             std::shared_ptr<Transform> transform;
+            // This part is trying to apply an entity's parents and
+            // grandparent's transform.
+            // TODO: This part should extract to an method. The method should be
+            // like this: void GetWorldTransform(shared_ptr<Transform>&
+            // world_transform,shared_ptr<Entity>& parent);
             if (parent == nullptr) {
                 transform = entity->GetComponent<Transform>();
             } else {
@@ -133,7 +138,7 @@ class RenderingSystem : public System {
                                GL_UNSIGNED_INT, nullptr);
                 glBindVertexArray(0);
             };
-            mRenderingManager.lock()->InsertRenderCommandGroup(
+            rendering_core.lock()->InsertRenderCommandGroup(
                 rendering_function);
         }
     }

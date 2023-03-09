@@ -10,7 +10,7 @@ classDiagram
         - string name_
         + weak_ptr<Entity> parent
         + vector<shared_ptr<Entity>> child
-        + weak_ptr<EntityManager> mEntityManager
+        + weak_ptr<EntityManager> entity_manager
     }
 
     class shit {

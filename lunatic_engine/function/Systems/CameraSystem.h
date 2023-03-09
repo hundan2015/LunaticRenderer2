@@ -12,7 +12,11 @@
 #include "glm/glm.hpp"
 namespace lunatic_engine {
 class MainCamera : public Component {};
-// TODO:CameraContext should be a component!
+/**
+ * CameraContext should be a new type like a Notification.
+ * This type of "component" is shared in different systems.
+ * These component doesn't belong to any entity. These context should be POD.
+ */
 struct CameraContext {
     static glm::mat4 view_;
     static glm::mat4 perspective_;

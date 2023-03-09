@@ -101,7 +101,13 @@ int main() {
             transform_ptr2->scale_y = 1;
             transform_ptr2->scale_z = 1;
 
-            transform_ptr2->position_z = 1;
+            transform_ptr2->position_z = 2;
+            transform_ptr2->position_y = 0.2f;
+            glm::qua<float> temp(glm::radians(glm::vec3(0,0,15)));
+            transform_ptr2->rotation_w = temp.w;
+            transform_ptr2->rotation_x = temp.x;
+            transform_ptr2->rotation_y = temp.y;
+            transform_ptr2->rotation_z = temp.z;
             std::shared_ptr<lunatic_engine::Entity> camera =
                 std::make_shared<lunatic_engine::Entity>();
             camera->addComponent(main_camera_ptr);
