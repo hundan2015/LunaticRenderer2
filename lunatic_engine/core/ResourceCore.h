@@ -57,7 +57,7 @@ class ResourceCore {
         shader_content->shader_program = shader_program;
         return shader_content;
     }
-    static std::string&& GetShaderFileString(const std::string& shader_dir) {
+    static std::string GetShaderFileString(const std::string& shader_dir) {
         std::ifstream shader_file;
         std::string res;
         shader_file.open(shader_dir);

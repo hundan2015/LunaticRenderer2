@@ -1,6 +1,12 @@
 # Lunatic Rendering Engine 2
 
 LRE2 是一个简单的玩具渲染引擎。主要用来测试逻辑与渲染分离的OpenGL架构。
+## Used Vcpkg packages
+* glad
+* glfw
+* Imgui
+* nlohmann_json
+* assimp
 
 ## 未来想要加入的功能
 
