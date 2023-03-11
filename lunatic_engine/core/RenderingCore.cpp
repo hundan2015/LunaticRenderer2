@@ -49,7 +49,7 @@ bool lunatic_engine::RenderingCore::InitOpenGL() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    window_ = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
+    window_ = glfwCreateWindow(800, 600, "Lunatic Engine 2", nullptr, nullptr);
     if (window_ == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
