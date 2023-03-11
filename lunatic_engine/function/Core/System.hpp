@@ -26,7 +26,7 @@ class RegisterComponent {
         std::cout << typeid(T).name() << " has registered." << std::endl;
     }
 };
-
+// TODO: In the future, every system should have a register method.
 class System {
    protected:
     int hash_code;

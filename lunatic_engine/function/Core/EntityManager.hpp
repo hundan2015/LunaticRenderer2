@@ -41,6 +41,8 @@ class EntityManager {
                 std::cout << "System need:" << component << std::endl;
             }
             std::vector<std::string> res;
+            // Using the set operations.
+            // TODO:In the future we should import the concept named Architype.
             std::ranges::set_difference(entity_have.begin(), entity_have.end(),
                                         system_map.begin(), system_map.end(),
                                         std::back_inserter(res));
