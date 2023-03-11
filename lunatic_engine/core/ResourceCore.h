@@ -142,10 +142,10 @@ class ResourceCore {
         // A kind of barrier, like future.
         while (!is_good)
             ;
-        MeshContent res;
+        MeshContent res{};
         res.triangle_count = mesh.triangle_count;
         res.vao = vao;
-        return std::move(res);
+        return res;
     }
 };
 

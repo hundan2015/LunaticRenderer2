@@ -42,8 +42,16 @@ class Entity {
         // TODO(Symbolic): Log warning.
         return nullptr;
     }
-    bool TestIsEnabled(const std::set<std::string>& requried_components) {
-        for (const auto& component_id : requried_components) {
+    /**
+     *
+     * @param requried_components
+     * @return Is the entity need to caculate.
+     * @warning This method should no longer available.
+     * Because it runs too slow, maybe we should use remove or add component
+     * to do these things. Or we should not use it directly.
+     */
+    bool TestIsEnabled(const std::set<std::string> &requried_components) {
+        for (const auto &component_id : requried_components) {
             auto result = components.find(component_id);
             if (result != components.end() && !result->second->enabled) {
                 return false;
@@ -53,14 +61,14 @@ class Entity {
         return true;
     }
     template <typename T>
-    void addComponent(std::shared_ptr<T> component) {
+    void AddComponent(std::shared_ptr<T> component) {
         std::shared_ptr<Component> component_temp =
             std::static_pointer_cast<Component>(component);
         components.insert(std::make_pair(typeid(T).name(), component_temp));
         // component_temp->entity = std::make_shared<Entity>(this);
         is_dirty = true;
     }
-    void RemoveComponent(const std::string& component) {
+    void RemoveComponent(const std::string &component) {
         is_dirty = true;
         components.erase(component);
     }

@@ -89,9 +89,9 @@ int main() {
 
             std::shared_ptr<lunatic_engine::Entity> entity =
                 std::make_shared<lunatic_engine::Entity>();
-            entity->addComponent<lunatic_engine::Material>(material_ptr);
-            entity->addComponent<lunatic_engine::Mesh>(mesh_ptr);
-            entity->addComponent<lunatic_engine::Transform>(transform_ptr);
+            entity->AddComponent<lunatic_engine::Material>(material_ptr);
+            entity->AddComponent<lunatic_engine::Mesh>(mesh_ptr);
+            entity->AddComponent<lunatic_engine::Transform>(transform_ptr);
 
             std::shared_ptr<lunatic_engine::MainCamera> main_camera_ptr =
                 std::make_shared<lunatic_engine::MainCamera>();
@@ -110,8 +110,8 @@ int main() {
             transform_ptr2->rotation_z = temp.z;
             std::shared_ptr<lunatic_engine::Entity> camera =
                 std::make_shared<lunatic_engine::Entity>();
-            camera->addComponent(main_camera_ptr);
-            camera->addComponent<lunatic_engine::Transform>(transform_ptr2);
+            camera->AddComponent(main_camera_ptr);
+            camera->AddComponent<lunatic_engine::Transform>(transform_ptr2);
 
             camera_system.RegisterToSystem(camera);
 
