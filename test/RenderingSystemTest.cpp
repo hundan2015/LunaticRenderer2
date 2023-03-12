@@ -13,56 +13,20 @@ int main() {
     lunatic_engine::CameraSystem camera_system;
     auto render_command_test = []() { std::cout << "Ticking!" << std::endl; };
     rendering_core->InitOpenGL();
+
+    lunatic_engine::model_loader::AssimpLoader assimp_loader;
+    assimp_loader.LoadModel(
+        "D:\\Programing\\c++\\CmakeProjects\\TestProject\\lunatic_"
+        "engine\\assets\\Models\\TestModel.fbx");
+
     std::thread tick_thread([&]() {
         // rendering_core->InsertRenderCommandGroup(render_command_test);
         {
-            float vertices[] = {
-                0.5f,  0.5f,  0.0f,  // top right
-                0.5f,  -0.5f, 0.0f,  // bottom right
-                -0.5f, -0.5f, 0.0f,  // bottom left
-                -0.5f, 0.5f,  0.0f   // top left
-            };
-            unsigned int indices[] = {
-                // note that we start from 0!
-                0, 1, 3,  // first Triangle
-                1, 2, 3   // second Triangle
-            };
-
-            unsigned int VBO, VAO, EBO;
-            bool isOK = false;
-            auto vao_create = [&]() {
-                glGenVertexArrays(1, &VAO);
-                glGenBuffers(1, &VBO);
-                glGenBuffers(1, &EBO);
-                // bind the Vertex Array Object first, then bind and set vertex
-                // buffer(s), and then configure vertex attributes(s).
-                glBindVertexArray(VAO);
-
-                glBindBuffer(GL_ARRAY_BUFFER, VBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
-                             GL_STATIC_DRAW);
-
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-                             GL_STATIC_DRAW);
-
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                                      3 * sizeof(float), (void *)0);
-                glEnableVertexAttribArray(0);
-
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
-                glBindVertexArray(0);
-                isOK = true;
-            };
-            rendering_core->InsertResoureCommandGroup(vao_create);
-            while (!isOK)
-                ;
-
+            lunatic_engine::MeshContent mesh_content =
+                resource_core->GetMeshContent(assimp_loader.GetMeshes()[1]);
             // Make a mesh component.
             std::shared_ptr<lunatic_engine::MeshContent> mesh_content_ptr =
-                std::make_shared<lunatic_engine::MeshContent>();
-            mesh_content_ptr->triangle_count = 2;
-            mesh_content_ptr->vao = VAO;
+                std::make_shared<lunatic_engine::MeshContent>(mesh_content);
             std::shared_ptr<lunatic_engine::Mesh> mesh_ptr =
                 std::make_shared<lunatic_engine::Mesh>();
             mesh_ptr->mesh_content = mesh_content_ptr;
@@ -101,9 +65,9 @@ int main() {
             transform_ptr2->scale_y = 1;
             transform_ptr2->scale_z = 1;
 
-            transform_ptr2->position_z = 2;
-            transform_ptr2->position_y = 0.2f;
-            glm::qua<float> temp(glm::radians(glm::vec3(0,0,15)));
+            transform_ptr2->position_z = 30;
+            transform_ptr2->position_y = 0;
+            glm::qua<float> temp(glm::radians(glm::vec3(0, 0, 15)));
             transform_ptr2->rotation_w = temp.w;
             transform_ptr2->rotation_x = temp.x;
             transform_ptr2->rotation_y = temp.y;
