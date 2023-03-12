@@ -113,8 +113,8 @@ class ResourceCore {
         }
         float* vertices_buffer = vertices_data.data();
         unsigned int* indices = mesh.ebo_s.data();
+        auto draw_mode = GL_STATIC_DRAW;
         auto get_mesh_vao_command = [&]() {
-            // TODO: Make a GetMeshContent method，
             glGenVertexArrays(1, &vao);
             glGenBuffers(1, &vbo);
             glGenBuffers(1, &ebo);
@@ -128,7 +128,7 @@ class ResourceCore {
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-                         GL_STATIC_DRAW);
+                         draw_mode);
 
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
                                   nullptr);

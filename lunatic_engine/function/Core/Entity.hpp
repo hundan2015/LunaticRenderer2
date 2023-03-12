@@ -39,7 +39,7 @@ class Entity {
         }
         std::string err_message =
             std::format("WARNING::Entity {} have no {}", name_, component_id);
-        // TODO(Symbolic): Log warning.
+        std::cout << err_message << std::endl;
         return nullptr;
     }
     /**
