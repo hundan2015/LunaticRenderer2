@@ -29,7 +29,7 @@ class Material : public Component {
     std::string shader_fs_dir;
     std::shared_ptr<lunatic_engine::ShaderContent> shader_content;
     std::map<std::string, std::string> name_dir_map;
-    std::map<std::string, lunatic_engine::ImageContent> name_image_content_map;
+    std::map<std::string, std::shared_ptr<lunatic_engine::ImageContent>> name_image_content_map;
     /**
      * @brief Going to set content to a shader.
      * @warning This function has been wrapped into a rendering command. So it
@@ -55,7 +55,7 @@ class Material : public Component {
         for (auto &pair : name_image_content_map) {
             // A usage provided by learn opengl.
             glActiveTexture(GL_TEXTURE0 + texture_id);
-            glBindTexture(GL_TEXTURE_2D, pair.second.image);
+            glBindTexture(GL_TEXTURE_2D, pair.second->image);
             texture_id++;
         }
     }

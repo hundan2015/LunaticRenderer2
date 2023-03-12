@@ -26,6 +26,7 @@ class Mesh : public Component {
    public:
     // static RegisterComponent<Mesh> RegisterComponent;
     std::string mesh_dir;
+    int mesh_num;
     std::shared_ptr<lunatic_engine::MeshContent> mesh_content;
 };
 inline void to_json(json& jsonObject, const Mesh& mesh) {

@@ -12,6 +12,13 @@ namespace lunatic_engine {
 class ResourceCore {
    public:
     std::shared_ptr<RenderingCore> rendering_core;
+    /**
+     *
+     * @param vertex_shader_dir Vertex shader's dir.
+     * @param fragment_shader_dir Fragment shader's dir.
+     * @return The shader content created by core.
+     * @brief Get shader context from the shader dir.
+     */
     [[nodiscard]] std::shared_ptr<lunatic_engine::ShaderContent>
     GetShaderContent(const std::string& vertex_shader_dir,
                      const std::string& fragment_shader_dir) const {
@@ -67,6 +74,13 @@ class ResourceCore {
         shader_file.close();
         return std::move(res);
     }
+    /**
+     *
+     * @param shader The shader's handle. Including vertex shader and fragment
+     * shader.
+     * @param type A enum including {'PROGRAM','VERTEX','FRAGMENT'}
+     * @brief Checking the errors of shader, and print them.
+     */
     static void CheckCompileErrors(GLuint shader, const std::string& type) {
         GLint success;
         GLchar info_log[1024];
@@ -96,11 +110,15 @@ class ResourceCore {
         }
     }
 
-    MeshContent GetMeshContent(model_loader::Mesh mesh) {
+    MeshContent GetMeshContent(model_loader::Mesh mesh) const {
         bool is_good = false;
-        unsigned int vao, vbo, ebo;
+        unsigned int vao;
+        unsigned int vbo;
+        unsigned int ebo;
         const auto vertices_count = mesh.vertices.size();
         std::vector<float> vertices_data;
+        // The VBO data is just like this:
+        //{position, normal, texcoord}
         for (auto i = 0; i < vertices_count; ++i) {
             vertices_data.emplace_back(mesh.vertices[i].x);
             vertices_data.emplace_back(mesh.vertices[i].y);
@@ -111,12 +129,6 @@ class ResourceCore {
             vertices_data.emplace_back(mesh.uvs[i].x);
             vertices_data.emplace_back(mesh.uvs[i].y);
         }
-
-        // float* vertices_buffer = &vertices_data[0];
-        /* std::vector<float> vertices_buffer = {
-             -0.5f, -0.5f, 0.0f, -0.5f, -0.5f, 0.0f, 0, 0,
-             0.5f,  -0.5f, 0.0f, 0.5f,  -0.5f, 0.0f, 0, 0,
-             0.0f,  0.5f,  0.0f, 0.0f,  0.5f,  0.0f, 0, 0};*/
 
         unsigned int* indices = mesh.ebo_s.data();
         // unsigned int indices[] = {0, 1, 2};
@@ -153,6 +165,8 @@ class ResourceCore {
             glBindVertexArray(0);
             is_good = true;
         };
+        // The lambda is a kind of resource command, which must be pushed into
+        // the rendering loop to interact with GLAD.
         rendering_core->InsertResoureCommandGroup(get_mesh_vao_command);
         // A kind of barrier, like future.
         while (!is_good)
