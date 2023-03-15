@@ -28,9 +28,11 @@ int main() {
             unsigned int texture;
             bool is_texture_OK = false;
             auto get_texture_content = [&]() {
-                int width, height, nr_channel;
+                int width;
+                int height;
+                int nr_channel;
                 unsigned char *data =
-                    stbi_load("assets/Textures/water.png", &width, &height,
+                    stbi_load("assets/Textures/table.jpg", &width, &height,
                               &nr_channel, 0);
 
                 if (data == nullptr) {
@@ -43,6 +45,10 @@ int main() {
                 glGenTextures(1, &texture_plus);
                 std::cout<<"Texture id"<<texture_plus<<std::endl;
                 glBindTexture(GL_TEXTURE_2D, texture_plus);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                              GL_UNSIGNED_BYTE, data);
                 glGenerateMipmap(GL_TEXTURE_2D);
@@ -76,6 +82,9 @@ int main() {
             material_ptr->shader_content = shader_content_ptr;
             material_ptr->name_image_content_map.insert(std::make_pair(
                 "_Albedo",
+                std::make_shared<lunatic_engine::ImageContent>(texture)));
+            material_ptr->name_image_content_map.insert(std::make_pair(
+                "_Shit",
                 std::make_shared<lunatic_engine::ImageContent>(texture)));
             //material_ptr->InitMaterial();
 
