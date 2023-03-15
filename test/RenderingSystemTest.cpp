@@ -19,7 +19,7 @@ int main() {
     rendering_core->InitOpenGL();
 
     lunatic_engine::model_loader::AssimpLoader assimp_loader;
-    assimp_loader.LoadModel("assets\\Models\\TestModel.fbx");
+    assimp_loader.LoadModel("assets/Models/box.fbx");
 
     std::thread tick_thread([&]() {
         // rendering_core->InsertRenderCommandGroup(render_command_test);
@@ -29,17 +29,24 @@ int main() {
             bool is_texture_OK = false;
             auto get_texture_content = [&]() {
                 int width, height, nr_channel;
-                unsigned char *data = stbi_load(
-                    "assets\\Textures\\table.jpg",
-                    &width, &height, &nr_channel, 0);
+                unsigned char *data =
+                    stbi_load("assets/Textures/water.png", &width, &height,
+                              &nr_channel, 0);
+
+                if (data == nullptr) {
+                    std::cout << "GG\n";
+                }else{
+                    std::cout<<data<<std::endl; 
+                }
                 auto texture_plus = texture;
                 // Don't try to get texture's address!
                 glGenTextures(1, &texture_plus);
+                std::cout<<"Texture id"<<texture_plus<<std::endl;
                 glBindTexture(GL_TEXTURE_2D, texture_plus);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                              GL_UNSIGNED_BYTE, data);
                 glGenerateMipmap(GL_TEXTURE_2D);
-                stbi_image_free(data);
+                //stbi_image_free(data);
                 is_texture_OK = true;
             };
             rendering_core->InsertResoureCommandGroup(get_texture_content);
@@ -58,8 +65,8 @@ int main() {
             // Make a shader component.
             std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
                 resource_core->GetShaderContent(
-                    "assets\\Shader\\TriangleShader_vs.glsl",
-                    "assets\\Shader\\TriangleShader_fs.glsl");
+                    "assets/Shader/TriangleShader_vs.glsl",
+                    "assets/Shader/TriangleShader_fs.glsl");
             std::cout << "ShaderProgram" << shader_content_ptr->shader_program
                       << std::endl;
 

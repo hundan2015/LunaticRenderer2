@@ -15,5 +15,5 @@ target_link_libraries(RenderingSystemTestT PRIVATE LIB_COMPONENT)
 add_custom_command(TARGET RenderingSystemTestT
         POST_BUILD
         COMMAND echo "Move ${CMAKE_SOURCE_DIR} to ${CMAKE_CURRENT_BINARY_DIR}"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/lunatic_engine/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/lunatic_engine/assets/ $<TARGET_FILE_DIR:RenderingSystemTestT>/assets
         )
