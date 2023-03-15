@@ -20,6 +20,7 @@
 #include "glm/detail/type_quat.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/transform.hpp"
+
 // #define GET_ID(x) GL_TEXTURE#x
 namespace lunatic_engine {
 class Material : public Component {
@@ -55,8 +56,12 @@ class Material : public Component {
             // A usage provided by learn opengl.
             glActiveTexture(GL_TEXTURE0 + texture_id);
             glBindTexture(GL_TEXTURE_2D, pair.second->image);
+            auto texture_position = glGetUniformLocation(
+                shader_content->shader_program, pair.first.c_str());
+            glUniform1i(texture_position, texture_id);
             texture_id++;
         }
+
     }
 };
 }  // namespace lunatic_engine

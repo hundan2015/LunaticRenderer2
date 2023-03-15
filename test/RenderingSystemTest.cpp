@@ -77,6 +77,7 @@ int main() {
             material_ptr->name_image_content_map.insert(std::make_pair(
                 "_Albedo",
                 std::make_shared<lunatic_engine::ImageContent>(texture)));
+            //material_ptr->InitMaterial();
 
             // Make a Transform ptr.
             std::shared_ptr<lunatic_engine::Transform> transform_ptr =
