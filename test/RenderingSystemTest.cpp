@@ -1,6 +1,6 @@
 #include <iostream>
 #include <memory>
-#include<thread>
+#include <thread>
 #include "../core/ResourceCore.h"
 #include "Systems/RenderSystem.hpp"
 
@@ -19,9 +19,7 @@ int main() {
     rendering_core->InitOpenGL();
 
     lunatic_engine::model_loader::AssimpLoader assimp_loader;
-    assimp_loader.LoadModel(
-        "D:\\Programing\\c++\\CmakeProjects\\TestProject\\lunatic_"
-        "engine\\assets\\Models\\TestModel.fbx");
+    assimp_loader.LoadModel("assets\\Models\\TestModel.fbx");
 
     std::thread tick_thread([&]() {
         // rendering_core->InsertRenderCommandGroup(render_command_test);
@@ -32,8 +30,7 @@ int main() {
             auto get_texture_content = [&]() {
                 int width, height, nr_channel;
                 unsigned char *data = stbi_load(
-                    "D:\\Programing\\c++\\CmakeProjects\\TestProject\\lunatic_"
-                    "engine\\assets\\Textures\\table.jpg",
+                    "assets\\Textures\\table.jpg",
                     &width, &height, &nr_channel, 0);
                 auto texture_plus = texture;
                 // Don't try to get texture's address!
@@ -61,10 +58,8 @@ int main() {
             // Make a shader component.
             std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
                 resource_core->GetShaderContent(
-                    "D:\\Programing\\c++\\CmakeProjects\\TestProject\\lunatic_"
-                    "engine\\assets\\Shader\\TriangleShader_vs.glsl",
-                    "D:\\Programing\\c++\\CmakeProjects\\TestProject\\lunatic_"
-                    "engine\\assets\\Shader\\TriangleShader_fs.glsl");
+                    "assets\\Shader\\TriangleShader_vs.glsl",
+                    "assets\\Shader\\TriangleShader_fs.glsl");
             std::cout << "ShaderProgram" << shader_content_ptr->shader_program
                       << std::endl;
 

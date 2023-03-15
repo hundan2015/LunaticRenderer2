@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.0.0)
-set(VCPKG_ROOT "D:/dev/vcpkg")
+IF (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    MESSAGE(STATUS "current platform: Linux ")
+    set(VCPKG_ROOT "~/vcpkg")
+ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    MESSAGE(STATUS "current platform: Windows")
+    set(VCPKG_ROOT "D:/dev/vcpkg")
+ENDIF()
+
 set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 set(CMAKE_GENERATOR "Ninja")
 
@@ -42,5 +49,12 @@ target_link_libraries(TestProject PUBLIC LIB_COMPONENT)
 # target_link_libraries(TestProject PRIVATE glfw)
 target_link_libraries(TestProject PRIVATE imgui::imgui)
 target_link_libraries(TestProject PRIVATE nlohmann_json::nlohmann_json)
+
+add_custom_command(TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND echo "Move"
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/lunatic_engine/assets ${CMAKE_BUILD_RPATH}/assets
+        )
+
 
 # target_link_libraries(TestProject PRIVATE Boost)

@@ -9,3 +9,11 @@ target_link_libraries(EntityManagerTestT PRIVATE LIB_COMPONENT)
 add_executable(RenderingSystemTestT RenderingSystemTest.cpp)
 target_link_libraries(RenderingSystemTestT PRIVATE lunatic_core)
 target_link_libraries(RenderingSystemTestT PRIVATE LIB_COMPONENT)
+
+
+# Copy method.
+add_custom_command(TARGET RenderingSystemTestT
+        POST_BUILD
+        COMMAND echo "Move ${CMAKE_SOURCE_DIR} to ${CMAKE_CURRENT_BINARY_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/lunatic_engine/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets
+        )
