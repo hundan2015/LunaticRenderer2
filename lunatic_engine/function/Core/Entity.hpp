@@ -1,9 +1,8 @@
 #pragma once
 
-#include <vcruntime_typeinfo.h>
 #include <algorithm>
 #include <cmath>
-#include <format>
+#include <fmt/core.h>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -38,7 +37,7 @@ class Entity {
             return std::static_pointer_cast<T>(result->second);
         }
         std::string err_message =
-            std::format("WARNING::Entity {} have no {}", name_, component_id);
+            fmt::format("WARNING::Entity {} have no {}", name_, component_id);
         std::cout << err_message << std::endl;
         return nullptr;
     }

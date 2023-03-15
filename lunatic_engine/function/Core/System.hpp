@@ -1,8 +1,7 @@
 #pragma once
-#include <vcruntime_typeinfo.h>
 #include <algorithm>
 #include <cmath>
-#include <format>
+#include "fmt/core.h"
 #include <iostream>
 #include <map>
 #include <memory>
@@ -38,14 +37,14 @@ class System {
         int register_result = 0;
         switch (register_result) {
             case 0:
-                std::cout << std::format(
+                std::cout << fmt::format(
                                  "[Debug] System {} has registered to the "
                                  "system manager.",
                                  system_name)
                           << std::endl;
                 break;
             case 1:
-                std::cout << std::format(
+                std::cout << fmt::format(
                     "[Warning] System {} has been registered.", system_name);
                 break;
         }

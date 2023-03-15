@@ -8,8 +8,10 @@ add_library(LIB_COMPONENT STATIC ${DIR_COPONENT} ${DIR_COPONENT_HPP} ${DIR_COPON
 #add_subdirectory("./Core")
 find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 target_link_libraries(LIB_COMPONENT PRIVATE glad::glad)
 target_link_libraries(LIB_COMPONENT PRIVATE glfw)
 target_link_libraries(LIB_COMPONENT PRIVATE lunatic_core)
+target_link_libraries(LIB_COMPONENT PUBLIC fmt::fmt-header-only)
 #target_link_libraries(LIB_COMPONENT PRIVATE ECS_core)

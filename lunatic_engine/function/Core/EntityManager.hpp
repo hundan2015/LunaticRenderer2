@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include <format>
+#include <fmt/core.h>
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -64,7 +64,7 @@ class EntityManager {
         if (iter == system_list.end()) {
             system_list.insert(std::make_pair(system_ptr->kName, system_ptr));
         } else {
-            std::string errmsg = std::format("System {} has been registered.",
+            std::string errmsg = fmt::format("System {} has been registered.",
                                              system_ptr->kName);
             std::cout << errmsg << std::endl;
         }

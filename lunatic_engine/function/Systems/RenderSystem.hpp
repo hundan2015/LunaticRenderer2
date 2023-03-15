@@ -1,5 +1,4 @@
 #pragma once
-#include <vcruntime_typeinfo.h>
 #include <glm/fwd.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>

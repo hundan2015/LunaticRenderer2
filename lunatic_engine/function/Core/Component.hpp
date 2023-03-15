@@ -1,9 +1,8 @@
 #pragma once
 
-#include <vcruntime_typeinfo.h>
 #include <algorithm>
 #include <cmath>
-#include <format>
+#include "fmt/core.h"
 #include <iostream>
 #include <map>
 #include <memory>
