@@ -61,7 +61,6 @@ class Material : public Component {
             glUniform1i(texture_position, texture_id);
             texture_id++;
         }
-
     }
 };
 }  // namespace lunatic_engine

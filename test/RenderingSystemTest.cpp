@@ -19,7 +19,7 @@ int main() {
     rendering_core->InitOpenGL();
 
     lunatic_engine::model_loader::AssimpLoader assimp_loader;
-    assimp_loader.LoadModel("assets/Models/box.fbx");
+    assimp_loader.LoadModel("assets/Models/TestModel.fbx");
 
     std::thread tick_thread([&]() {
         // rendering_core->InsertRenderCommandGroup(render_command_test);
@@ -28,31 +28,49 @@ int main() {
             unsigned int texture;
             bool is_texture_OK = false;
             auto get_texture_content = [&]() {
-                int width, height, nr_channel;
+                int width;
+                int height;
+                int nr_channel;
                 unsigned char *data =
-                    stbi_load("assets/Textures/water.png", &width, &height,
+                    stbi_load("assets/Textures/table.jpg", &width, &height,
                               &nr_channel, 0);
 
                 if (data == nullptr) {
                     std::cout << "GG\n";
-                }else{
-                    std::cout<<data<<std::endl; 
+                } else {
+                    std::cout << "Loaded texture." << std::endl;
                 }
-                auto texture_plus = texture;
+                // Final I found this fucking mistake! In the previous version
+                // it can't pass the value to the texture. So the texture is
+                // fucking black!
+                auto &texture_plus = texture;
                 // Don't try to get texture's address!
                 glGenTextures(1, &texture_plus);
-                std::cout<<"Texture id"<<texture_plus<<std::endl;
+                std::cout << "Texture id" << texture_plus << std::endl;
                 glBindTexture(GL_TEXTURE_2D, texture_plus);
+                /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                             GL_UNSIGNED_BYTE, data);
+                glGenerateMipmap(GL_TEXTURE_2D);*/
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                                GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                                GL_LINEAR_MIPMAP_LINEAR);
+
+                // glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                              GL_UNSIGNED_BYTE, data);
                 glGenerateMipmap(GL_TEXTURE_2D);
-                //stbi_image_free(data);
+                stbi_image_free(data);
                 is_texture_OK = true;
             };
             rendering_core->InsertResoureCommandGroup(get_texture_content);
             while (is_texture_OK)
                 ;
-
+            std::cout << texture << std::endl;
             // Make a mesh component.
             lunatic_engine::MeshContent mesh_content =
                 resource_core->GetMeshContent(assimp_loader.GetMeshes()[0]);
@@ -77,7 +95,8 @@ int main() {
             material_ptr->name_image_content_map.insert(std::make_pair(
                 "_Albedo",
                 std::make_shared<lunatic_engine::ImageContent>(texture)));
-            //material_ptr->InitMaterial();
+
+            // material_ptr->InitMaterial();
 
             // Make a Transform ptr.
             std::shared_ptr<lunatic_engine::Transform> transform_ptr =
