@@ -16,26 +16,26 @@ namespace lunatic_engine {
 class Transform : public Component {
    public:
     Transform() = default;
-    float position_x;
-    float position_y;
-    float position_z;
-    float scale_x;
-    float scale_y;
-    float scale_z;
+    float position_x = 0;
+    float position_y = 0;
+    float position_z = 0;
+    float scale_x = 1;
+    float scale_y = 1;
+    float scale_z = 1;
     // Quartanion rotation.
-    float rotation_x;
-    float rotation_y;
-    float rotation_z;
-    float rotation_w;
+    float rotation_x = 0;
+    float rotation_y = 0;
+    float rotation_z = 0;
+    float rotation_w = 0;
     // static RegisterComponent<Transform> mRegisterComponent_;
 };
 /* RegisterComponent<Transform> Transform::mRegisterComponent_ =
     RegisterComponent<Transform>(); */
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position_x, position_y,
-                                   position_z,
-                                   scale_x, scale_y, scale_z, rotation_w,
-                                   rotation_x, rotation_y, rotation_z)
+                                   position_z, scale_x, scale_y, scale_z,
+                                   rotation_w, rotation_x, rotation_y,
+                                   rotation_z)
 
 class TransformManager {
    public:

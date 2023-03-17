@@ -17,6 +17,7 @@ class Mesh {
     unsigned int triangle_count;
 };
 class AssimpLoader {
+    // TODO: Mesh should not be a vector. Which should be a tree node.
     std::vector<Mesh> meshes_;
 
    public:
@@ -35,6 +36,7 @@ class AssimpLoader {
 
         ProcessNode(scene->mRootNode, scene);
     }
+
     void ProcessNode(aiNode *node, const aiScene *scene) {
         // 处理节点所有的网格（如果有的话）
         for (unsigned int i = 0; i < node->mNumMeshes; i++) {
@@ -46,6 +48,10 @@ class AssimpLoader {
             ProcessNode(node->mChildren[i], scene);
         }
     }
+    /**
+     * @param mesh The input ai mesh.
+     * @return A Mesh from Assimp loader which supported by the OpenGL.
+     */
     static Mesh ProcessMesh(aiMesh *mesh) {
         Mesh res;
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
@@ -66,7 +72,7 @@ class AssimpLoader {
                 res.uvs.emplace_back(uv);
             }
         }
-        res.triangle_count=mesh->mNumFaces;
+        res.triangle_count = mesh->mNumFaces;
         for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
             aiFace &face = mesh->mFaces[i];
             for (unsigned int j = 0; j < face.mNumIndices; ++j) {

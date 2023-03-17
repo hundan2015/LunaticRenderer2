@@ -61,7 +61,20 @@ class RenderingSystem : public System {
     std::weak_ptr<RenderingCore> rendering_core;
 
     void OnStart() override {}
-
+    void GetWorldTransform(std::shared_ptr<Transform>& transform,
+                           std::shared_ptr<Entity> last_entity) {
+        std::shared_ptr<Entity> parent_entity = last_entity->parent.lock();
+        std::shared_ptr<Transform> transform_com =
+            last_entity->GetComponent<Transform>();
+        if (parent_entity == nullptr) {
+            // You need get a new transform but not
+            // get the ptr!
+            transform = std::make_shared<Transform>(*(transform_com));
+        } else {
+            GetWorldTransform(transform,parent_entity);
+            transform = GetTransformFromParent(transform, transform_com);
+        }
+    }
     void OnTick(float deltaTime) override {
         std::cout << "Rendering system is ticking." << deltaTime << std::endl;
         for (const auto& entity : targets_) {
@@ -83,24 +96,7 @@ class RenderingSystem : public System {
                 transform = entity->GetComponent<Transform>();
             } else {
                 // transform = std::make_shared<Transform>();
-                auto get_world_transform =
-                    [&](const std::shared_ptr<Entity>& lastEntity) {
-                        std::shared_ptr<Entity> parent_entity =
-                            lastEntity->parent.lock();
-                        std::shared_ptr<Transform> transform_com =
-                            lastEntity->GetComponent<Transform>();
-                        if (parent_entity == nullptr) {
-                            // You need get a new transform but not
-                            // get the ptr!
-                            transform =
-                                std::make_shared<Transform>(*(transform_com));
-                        } else {
-                            transform = GetTransformFromParent(transform,
-                                                               transform_com);
-                        }
-                        return;
-                    };
-                get_world_transform(parent);
+                GetWorldTransform(transform, entity);
             }
 
             // Calculate Transform matrix.
@@ -137,8 +133,7 @@ class RenderingSystem : public System {
                                GL_UNSIGNED_INT, nullptr);
                 glBindVertexArray(0);
             };
-            rendering_core.lock()->InsertRenderCommandGroup(
-                rendering_function);
+            rendering_core.lock()->InsertRenderCommandGroup(rendering_function);
         }
     }
     void OnDisabled() override {}

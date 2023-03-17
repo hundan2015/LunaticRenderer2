@@ -74,7 +74,7 @@ int main() {
             transform_ptr2->scale_z = 1;
 
             transform_ptr2->position_z = 30;
-            transform_ptr2->position_x = 10;
+            transform_ptr2->position_x = 0;
             transform_ptr2->position_y = 0;
 
             glm::qua<float> temp(glm::radians(glm::vec3(0, 0, 0)));

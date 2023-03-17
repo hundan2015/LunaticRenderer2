@@ -190,7 +190,7 @@ class ResourceCore {
             const char* directory_str = directory.c_str();
             data = stbi_load(directory_str, &width, &height,
                              &nr_channel, 0);
-
+            assert(data!= nullptr);
             if (data == nullptr) {
                 std::cout << "The texture failed ot load!\n";
             } else {

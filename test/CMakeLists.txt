@@ -10,6 +10,9 @@ add_executable(RenderingSystemTestT RenderingSystemTest.cpp)
 target_link_libraries(RenderingSystemTestT PRIVATE lunatic_core)
 target_link_libraries(RenderingSystemTestT PRIVATE LIB_COMPONENT)
 
+add_executable(GetWorldTransformTest GetWorldTransformTest.cpp)
+target_link_libraries(GetWorldTransformTest PRIVATE lunatic_core)
+target_link_libraries(GetWorldTransformTest PRIVATE LIB_COMPONENT)
 
 # Copy method.
 add_custom_command(TARGET RenderingSystemTestT
