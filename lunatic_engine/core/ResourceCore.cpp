@@ -1,12 +1,13 @@
 //
 // Created by Symbolic on 2023/3/18.
 //
+// If we have lnk2005, try to make def into the cpp file, not the header file.
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #endif
-#include "stb_image.h"
 #include "ResourceCore.h"
 #include <thread>
+#include "stb_image.h"
 std::shared_ptr<lunatic_engine::ShaderContent>
 lunatic_engine::ResourceCore::GetShaderContent(
     const std::string& vertex_shader_dir,
@@ -23,28 +24,28 @@ lunatic_engine::ResourceCore::GetShaderContent(
 
     unsigned int shader_program;
     auto create_shader_source = [=, &is_good, &shader_program]() mutable {
-      unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-      const char* shit1 = vertex_shader_source.c_str();
-      const char* shit2 = fragment_shader_source.c_str();
-      glShaderSource(vertex_shader, 1, &shit1, nullptr);
-      glCompileShader(vertex_shader);
-      CheckCompileErrors(vertex_shader, "VERTEX");
+        unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+        const char* shit1 = vertex_shader_source.c_str();
+        const char* shit2 = fragment_shader_source.c_str();
+        glShaderSource(vertex_shader, 1, &shit1, nullptr);
+        glCompileShader(vertex_shader);
+        CheckCompileErrors(vertex_shader, "VERTEX");
 
-      unsigned int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-      glShaderSource(fragment_shader, 1, &shit2, nullptr);
-      glCompileShader(fragment_shader);
-      CheckCompileErrors(fragment_shader, "FRAGMENT");
+        unsigned int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragment_shader, 1, &shit2, nullptr);
+        glCompileShader(fragment_shader);
+        CheckCompileErrors(fragment_shader, "FRAGMENT");
 
-      shader_program = glCreateProgram();
-      glAttachShader(shader_program, vertex_shader);
-      glAttachShader(shader_program, fragment_shader);
-      glLinkProgram(shader_program);
+        shader_program = glCreateProgram();
+        glAttachShader(shader_program, vertex_shader);
+        glAttachShader(shader_program, fragment_shader);
+        glLinkProgram(shader_program);
 
-      glDeleteShader(vertex_shader);
-      glDeleteShader(fragment_shader);
-      // is_good like a future. Until is_good, the function wouldn't
-      // return a content.
-      is_good = true;
+        glDeleteShader(vertex_shader);
+        glDeleteShader(fragment_shader);
+        // is_good like a future. Until is_good, the function wouldn't
+        // return a content.
+        is_good = true;
     };
     rendering_core->InsertResoureCommandGroup(create_shader_source);
     // Kind of barrier.
@@ -73,8 +74,7 @@ void lunatic_engine::ResourceCore::CheckCompileErrors(GLuint shader,
         if (!success) {
             glGetShaderInfoLog(shader, 1024, nullptr, info_log);
             std::cout
-                << "ERROR::SHADER_COMPILATION_ERROR of type: " << type
-                << "\n"
+                << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
                 << info_log
                 << "\n -- "
                    "--------------------------------------------------- -- "
@@ -117,37 +117,36 @@ lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
     unsigned int* indices = mesh.ebo_s.data();
     // unsigned int indices[] = {0, 1, 2};
     auto draw_mode = GL_STATIC_DRAW;
+    // TODO: Add some options to make Mesh support skeleton.
     auto get_mesh_vao_command = [&]() {
-      glGenVertexArrays(1, &vao);
-      glGenBuffers(1, &vbo);
-      glGenBuffers(1, &ebo);
-      // bind the Vertex Array Object first, then bind and set vertex
-      // buffer(s), and then configure vertex attributes(s).
-      glBindVertexArray(vao);
+        glGenVertexArrays(1, &vao);
+        glGenBuffers(1, &vbo);
+        glGenBuffers(1, &ebo);
+        // bind the Vertex Array Object first, then bind and set vertex
+        // buffer(s), and then configure vertex attributes(s).
+        glBindVertexArray(vao);
 
-      glBindBuffer(GL_ARRAY_BUFFER, vbo);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices_data.size(),
-                   vertices_data.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices_data.size(),
+                     vertices_data.data(), GL_STATIC_DRAW);
 
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                   sizeof(float) * mesh.ebo_s.size(), indices, draw_mode);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float) * mesh.ebo_s.size(),
+                     indices, draw_mode);
 
-      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                            nullptr);
-      glEnableVertexAttribArray(0);
-      glVertexAttribPointer(
-          1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-          reinterpret_cast<const void*>(3 * sizeof(float)));
-      glEnableVertexAttribArray(1);
-      glVertexAttribPointer(
-          2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-          reinterpret_cast<const void*>(6 * sizeof(float)));
-      glEnableVertexAttribArray(2);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              nullptr);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              reinterpret_cast<const void*>(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              reinterpret_cast<const void*>(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
 
-      glBindBuffer(GL_ARRAY_BUFFER, 0);
-      glBindVertexArray(0);
-      is_good = true;
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+        is_good = true;
     };
     // The lambda is a kind of resource command, which must be pushed into
     // the rendering loop to interact with GLAD.
@@ -165,47 +164,42 @@ lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
     unsigned int texture;
     bool is_texture_ok = false;
     auto get_texture_content = [=, &texture, &is_texture_ok]() {
-      int width;
-      int height;
-      int nr_channel;
-      unsigned char* data = nullptr;
-      const char* directory_str = directory.c_str();
-      data = stbi_load(directory_str, &width, &height, &nr_channel, 0);
-      assert(data != nullptr);
-      if (data == nullptr) {
-          std::cout << "The texture failed ot load!\n";
-      } else {
-          std::cout << "Loaded texture." << std::endl;
-      }
-      // Final I found this fucking mistake! In the previous version
-      // it can't pass the value to the texture. So the texture is
-      // fucking black!
-      auto texture_plus = texture;
-      // Don't try to get texture's address!
-      glGenTextures(1, &texture_plus);
-      std::cout << "Texture id" << texture_plus << std::endl;
-      glBindTexture(GL_TEXTURE_2D, texture_plus);
-      /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                   GL_UNSIGNED_BYTE, data);
-      glGenerateMipmap(GL_TEXTURE_2D);*/
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                      GL_LINEAR_MIPMAP_LINEAR);
+        int width;
+        int height;
+        int nr_channel;
+        unsigned char* data = nullptr;
+        const char* directory_str = directory.c_str();
+        data = stbi_load(directory_str, &width, &height, &nr_channel, 0);
+        assert(data != nullptr);
+        if (data == nullptr) {
+            std::cout << "The texture failed ot load!\n";
+        } else {
+            std::cout << "Loaded texture." << std::endl;
+        }
+        // Final I found this fucking mistake! In the previous version
+        // it can't pass the value to the texture. So the texture is
+        // fucking black!
+        auto texture_plus = texture;
+        // Don't try to get texture's address!
+        glGenTextures(1, &texture_plus);
+        std::cout << "Texture id" << texture_plus << std::endl;
+        glBindTexture(GL_TEXTURE_2D, texture_plus);
 
-      // glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                   GL_UNSIGNED_BYTE, data);
-      glGenerateMipmap(GL_TEXTURE_2D);
-      stbi_image_free(data);
-      texture = texture_plus;
-      is_texture_ok = true;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                        GL_LINEAR_MIPMAP_LINEAR);
+
+        // glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                     GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        stbi_image_free(data);
+        texture = texture_plus;
+        is_texture_ok = true;
     };
     rendering_core->InsertResoureCommandGroup(get_texture_content);
-    while (!is_texture_ok)
-        std::this_thread::yield();
+    while (!is_texture_ok) std::this_thread::yield();
     return ImageContent(texture);
 }

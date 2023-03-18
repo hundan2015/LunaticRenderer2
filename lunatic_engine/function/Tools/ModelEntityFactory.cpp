@@ -22,7 +22,7 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
 
         // Make a Material component.
         lunatic_engine::ImageContent temp_image_content =
-            resource_core->GetImageContent("assets/Textures/table.jpg");
+            resource_core->GetImageContent("assets/Textures/Chess.jpg");
         std::shared_ptr<lunatic_engine::Material> material_ptr =
             std::make_shared<lunatic_engine::Material>();
         material_ptr->shader_content = shader_content_ptr;

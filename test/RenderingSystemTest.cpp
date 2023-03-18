@@ -29,7 +29,7 @@ int main() {
             lunatic_engine::ModelEntityFactory model_entity_factory;
             model_entity_factory.resource_core = resource_core;
             std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node =
-                assimp_loader.GetMeshNode("assets/Models/shitBox.fbx");
+                assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");
             auto entity = model_entity_factory.GetModelEntity(mesh_node);
 
             // Make a main camera entity.

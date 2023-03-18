@@ -23,8 +23,7 @@ class MeshNode {
     std::vector<std::shared_ptr<MeshNode>> child;
 };
 class AssimpLoader {
-    // TODO: Mesh should not be a vector. Which should be a tree node.
-    std::vector<Mesh> meshes_;
+
     std::shared_ptr<MeshNode> mesh_root_;
 
    public:
@@ -62,27 +61,6 @@ class AssimpLoader {
         return mesh_node;
     }
 
-    void ProcessNode(aiNode *node, const aiScene *scene) {
-        // 处理节点所有的网格（如果有的话）
-        Mesh mesh_temp;
-        /**
-         * In traditional scene, it's not permitted if a node have multi-mesh.
-         * For containing the node multi-mesh info,
-         * Here we use the ProcessMesh to combine all the mesh in one node.
-         */
-        for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-            aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-            mesh_temp = ProcessMesh(mesh, mesh_temp);
-        }
-        if (!mesh_temp.vertices.empty()) {
-            meshes_.push_back(mesh_temp);
-        }
-
-        // 接下来对它的子节点重复这一过程
-        for (unsigned int i = 0; i < node->mNumChildren; i++) {
-            ProcessNode(node->mChildren[i], scene);
-        }
-    }
     /**
      * @param mesh The input ai mesh.
      * @return A Mesh from Assimp loader which supported by the OpenGL.
@@ -116,11 +94,7 @@ class AssimpLoader {
         }
         return res;
     }
-    std::vector<Mesh> &GetMeshes() { return meshes_; }
-    std::vector<Mesh> &GetMeshes(const std::string &dir) {
-        LoadModel(dir);
-        return meshes_;
-    }
+
     std::shared_ptr<MeshNode> GetMeshNode(const std::string &dir) {
         LoadModel(dir);
         return mesh_root_;

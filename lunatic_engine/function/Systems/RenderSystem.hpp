@@ -89,9 +89,7 @@ class RenderingSystem : public System {
             std::shared_ptr<Transform> transform;
             // This part is trying to apply an entity's parents and
             // grandparent's transform.
-            // TODO: This part should extract to an method. The method should be
-            // like this: void GetWorldTransform(shared_ptr<Transform>&
-            // world_transform,shared_ptr<Entity>& parent);
+
             if (parent == nullptr) {
                 transform = entity->GetComponent<Transform>();
             } else {
