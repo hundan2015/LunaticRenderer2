@@ -1,7 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <fmt/core.h>
+#include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -25,7 +25,21 @@ class EntityManager {
     std::queue<std::shared_ptr<Entity>> need_to_destroy;
     std::shared_ptr<Entity> main_camera;
     // TODO: These should move to a new class named SystemManager.
-    void RegisterToSystem(const std::shared_ptr<Entity> &entity) {
+    void RegisterEntitiesToSystem(std::shared_ptr<Entity> entity) {
+        std::queue<std::shared_ptr<Entity>> entity_queue;
+        entity_queue.push(entity);
+        while (!entity_queue.empty()) {
+            auto front = entity_queue.front();
+            entity_queue.pop();
+            for (const auto &child : front->child) {
+                entity_queue.push(child);
+            }
+            RegisterSingleEntityToSystem(front, false);
+        }
+    }
+
+    void RegisterSingleEntityToSystem(const std::shared_ptr<Entity> &entity,
+                                      bool can_it_destroy = true) {
         bool have_a_system = false;
         /**
          * It's using the string set to compare.
@@ -43,8 +57,8 @@ class EntityManager {
             std::vector<std::string> res;
             // Using the set operations.
             // TODO:In the future we should import the concept named Architype.
-            std::ranges::set_difference(entity_have.begin(), entity_have.end(),
-                                        system_map.begin(), system_map.end(),
+            std::ranges::set_difference(system_map.begin(), system_map.end(),
+                                        entity_have.begin(), entity_have.end(),
                                         std::back_inserter(res));
             if (res.empty()) {
                 system.second->RegisterToSystem(entity);
@@ -54,7 +68,7 @@ class EntityManager {
                 have_a_system = true;
             }
         }
-        if (!have_a_system) {
+        if (!have_a_system && can_it_destroy) {
             need_to_destroy.push(entity);
         }
     }
@@ -74,7 +88,7 @@ class EntityManager {
     void ManageEntity() {
         for (const auto &entity : entity_list) {
             if (entity->is_dirty) {
-                RegisterToSystem(entity);
+                RegisterSingleEntityToSystem(entity);
             }
         }
         while (!need_to_destroy.empty()) {

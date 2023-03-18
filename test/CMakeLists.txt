@@ -7,8 +7,8 @@ target_link_libraries(EntityManagerTestT PRIVATE lunatic_core)
 target_link_libraries(EntityManagerTestT PRIVATE LIB_COMPONENT)
 
 add_executable(RenderingSystemTestT RenderingSystemTest.cpp)
-target_link_libraries(RenderingSystemTestT PRIVATE lunatic_core)
-target_link_libraries(RenderingSystemTestT PRIVATE LIB_COMPONENT)
+#target_link_libraries(RenderingSystemTestT PUBLIC lunatic_core)
+target_link_libraries(RenderingSystemTestT PUBLIC LIB_COMPONENT)
 
 add_executable(GetWorldTransformTest GetWorldTransformTest.cpp)
 target_link_libraries(GetWorldTransformTest PRIVATE lunatic_core)

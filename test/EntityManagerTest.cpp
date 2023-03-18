@@ -18,7 +18,7 @@ int main() {
     entity_manager->RegisterSystem(std::make_shared<TestSystem>());
     entity_manager->RegisterSystem(std::make_shared<RenderingSystem>());
     // entity_manager.entityList.insert(entity);
-    entity_manager->RegisterToSystem(entity1);
+    entity_manager->RegisterSingleEntityToSystem(entity1);
     // entity_manager.ManageEntity();
     // entity_manager.deltaTime = std::make_shared<float>(1);
     entity_manager->LogicalTick(1);

@@ -16,10 +16,15 @@ class Mesh {
     std::vector<glm::vec2> uvs;
     unsigned int triangle_count = 0;
 };
-
+class MeshNode {
+   public:
+    std::shared_ptr<Mesh> mesh = nullptr;
+    std::vector<std::shared_ptr<MeshNode>> child;
+};
 class AssimpLoader {
     // TODO: Mesh should not be a vector. Which should be a tree node.
     std::vector<Mesh> meshes_;
+    std::shared_ptr<MeshNode> mesh_root_;
 
    public:
     void LoadModel(const std::string &path) {
@@ -35,7 +40,25 @@ class AssimpLoader {
         }
         std::string directory = path.substr(0, path.find_last_of('/'));
 
-        ProcessNode(scene->mRootNode, scene);
+        // ProcessNode(scene->mRootNode, scene);
+        mesh_root_ = ProcessNodeDeco(scene->mRootNode, scene);
+    }
+    std::shared_ptr<MeshNode> ProcessNodeDeco(aiNode *node,
+                                              const aiScene *scene) {
+        auto mesh_node = std::make_shared<MeshNode>();
+        auto mesh_temp = Mesh();
+        for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+            aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+            mesh_temp = ProcessMesh(mesh, mesh_temp);
+        }
+        if (!mesh_temp.vertices.empty()) {
+            mesh_node->mesh = std::make_shared<Mesh>(mesh_temp);
+        }
+        for (unsigned int i = 0; i < node->mNumChildren; i++) {
+            mesh_node->child.emplace_back(
+                ProcessNodeDeco(node->mChildren[i], scene));
+        }
+        return mesh_node;
     }
 
     void ProcessNode(aiNode *node, const aiScene *scene) {
@@ -50,7 +73,7 @@ class AssimpLoader {
             aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
             mesh_temp = ProcessMesh(mesh, mesh_temp);
         }
-        if (mesh_temp.vertices.size() > 0) {
+        if (!mesh_temp.vertices.empty()) {
             meshes_.push_back(mesh_temp);
         }
 
@@ -96,6 +119,10 @@ class AssimpLoader {
     std::vector<Mesh> &GetMeshes(const std::string &dir) {
         LoadModel(dir);
         return meshes_;
+    }
+    std::shared_ptr<MeshNode> GetMeshNode(const std::string &dir) {
+        LoadModel(dir);
+        return mesh_root_;
     }
 };
 
