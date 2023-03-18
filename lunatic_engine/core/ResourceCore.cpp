@@ -6,6 +6,7 @@
 #endif
 #include "stb_image.h"
 #include "ResourceCore.h"
+#include <thread>
 std::shared_ptr<lunatic_engine::ShaderContent>
 lunatic_engine::ResourceCore::GetShaderContent(
     const std::string& vertex_shader_dir,

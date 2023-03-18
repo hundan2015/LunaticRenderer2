@@ -5,6 +5,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <iostream>
+#include <memory>
 #include <vector>
 namespace lunatic_engine {
 namespace model_loader {
