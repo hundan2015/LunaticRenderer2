@@ -14,8 +14,9 @@ class Mesh {
     std::vector<glm::vec3> normals;
     std::vector<unsigned int> ebo_s;
     std::vector<glm::vec2> uvs;
-    unsigned int triangle_count;
+    unsigned int triangle_count = 0;
 };
+
 class AssimpLoader {
     // TODO: Mesh should not be a vector. Which should be a tree node.
     std::vector<Mesh> meshes_;
@@ -39,10 +40,20 @@ class AssimpLoader {
 
     void ProcessNode(aiNode *node, const aiScene *scene) {
         // 处理节点所有的网格（如果有的话）
+        Mesh mesh_temp;
+        /**
+         * In traditional scene, it's not permitted if a node have multi-mesh.
+         * For containing the node multi-mesh info,
+         * Here we use the ProcessMesh to combine all the mesh in one node.
+         */
         for (unsigned int i = 0; i < node->mNumMeshes; i++) {
             aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes_.push_back(ProcessMesh(mesh));
+            mesh_temp = ProcessMesh(mesh, mesh_temp);
         }
+        if (mesh_temp.vertices.size() > 0) {
+            meshes_.push_back(mesh_temp);
+        }
+
         // 接下来对它的子节点重复这一过程
         for (unsigned int i = 0; i < node->mNumChildren; i++) {
             ProcessNode(node->mChildren[i], scene);
@@ -52,8 +63,8 @@ class AssimpLoader {
      * @param mesh The input ai mesh.
      * @return A Mesh from Assimp loader which supported by the OpenGL.
      */
-    static Mesh ProcessMesh(aiMesh *mesh) {
-        Mesh res;
+    static Mesh ProcessMesh(aiMesh *mesh, Mesh res = Mesh()) {
+        // Mesh res;
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
             glm::vec3 vertex;
             glm::vec3 normal;
@@ -72,7 +83,7 @@ class AssimpLoader {
                 res.uvs.emplace_back(uv);
             }
         }
-        res.triangle_count = mesh->mNumFaces;
+        res.triangle_count += mesh->mNumFaces;
         for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
             aiFace &face = mesh->mFaces[i];
             for (unsigned int j = 0; j < face.mNumIndices; ++j) {
