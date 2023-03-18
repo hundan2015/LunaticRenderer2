@@ -76,7 +76,7 @@ int main() {
             lunatic_engine::ModelEntityFactory model_entity_factory;
             model_entity_factory.resource_core = resource_core;
             std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node =
-                assimp_loader.GetMeshNode("assets/Models/TestModel.fbx");
+                assimp_loader.GetMeshNode("assets/Models/space.obj");
             auto entity = model_entity_factory.GetModelEntity(mesh_node);
 
             // Make a main camera entity.
@@ -88,11 +88,11 @@ int main() {
             transform_ptr2->scale_y = 1;
             transform_ptr2->scale_z = 1;
 
-            transform_ptr2->position_z = 30;
+            transform_ptr2->position_z = 15;
             transform_ptr2->position_x = 0;
-            transform_ptr2->position_y = 0;
+            transform_ptr2->position_y = 10;
 
-            glm::qua<float> temp(glm::radians(glm::vec3(0, 0, 0)));
+            glm::qua<float> temp(glm::radians(glm::vec3(-45, 0, 0)));
             transform_ptr2->rotation_w = temp.w;
             transform_ptr2->rotation_x = temp.x;
             transform_ptr2->rotation_y = temp.y;
