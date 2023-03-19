@@ -71,7 +71,7 @@ class RenderingSystem : public System {
             // get the ptr!
             transform = std::make_shared<Transform>(*(transform_com));
         } else {
-            GetWorldTransform(transform,parent_entity);
+            GetWorldTransform(transform, parent_entity);
             transform = GetTransformFromParent(transform, transform_com);
         }
     }
@@ -126,6 +126,8 @@ class RenderingSystem : public System {
                                    glm::value_ptr(final_mat));
                 material->SetMaterial();
                 glBindVertexArray(mesh->mesh_content->vao);
+                std::cout << "Mesh VAO:" << mesh->mesh_content->vao
+                          << std::endl;
                 glDrawElements(GL_TRIANGLES,
                                mesh->mesh_content->triangle_count * 3,
                                GL_UNSIGNED_INT, nullptr);

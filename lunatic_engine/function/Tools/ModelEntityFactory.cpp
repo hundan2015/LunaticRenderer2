@@ -7,6 +7,7 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
     std::shared_ptr<Transform> transform = std::make_shared<Transform>();
     entity_root->AddComponent<Transform>(transform);
     if (mesh_node->mesh) {
+        std::cout << "Have mesh!" << mesh_node->mesh->triangle_count << std::endl;
         std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
         lunatic_engine::MeshContent mesh_content =
             resource_core->GetMeshContent(*(mesh_node->mesh));

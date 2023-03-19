@@ -138,24 +138,25 @@ lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
                               nullptr);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                              reinterpret_cast<const void*>(3 * sizeof(float)));
+                              (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                              reinterpret_cast<const void*>(6 * sizeof(float)));
+                              (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+        std::cout << "Created VAO:" << vao << std::endl;
         is_good = true;
     };
     // The lambda is a kind of resource command, which must be pushed into
     // the rendering loop to interact with GLAD.
     rendering_core->InsertResoureCommandGroup(get_mesh_vao_command);
     // A kind of barrier, like future.
-    while (!is_good)
-        ;
+    while (!is_good) std::this_thread::yield();
     MeshContent res{};
     res.triangle_count = mesh.triangle_count;
+    std::cout << "Having VAO:" << vao << std::endl;
     res.vao = vao;
     return res;
 }

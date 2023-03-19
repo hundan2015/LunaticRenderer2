@@ -62,6 +62,6 @@ bool lunatic_engine::RenderingCore::InitOpenGL() {
     }
     glViewport(0, 0, 800, 600);
     glEnable(GL_DEPTH_TEST);
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     return true;
 }

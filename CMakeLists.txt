@@ -9,7 +9,7 @@ ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Windows")
     include_directories("${VCPKG_ROOT}/installed/x64-windows/include")
 ENDIF()
 #set(VCPKG_ROOT "~/vcpkg")
-#set(VCPKG_ROOT "D:/dev/vcpkg")
+set(VCPKG_ROOT "D:/dev/vcpkg")
 set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 set(CMAKE_GENERATOR "Ninja")
 
