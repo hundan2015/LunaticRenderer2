@@ -30,7 +30,13 @@ int main() {
             model_entity_factory.resource_core = resource_core;
             std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node =
                 assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");
-            auto entity = model_entity_factory.GetModelEntity(mesh_node);
+            std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
+                resource_core->GetShaderContent(
+                    "assets/Shader/TriangleShader_vs.glsl",
+                    "assets/Shader/TriangleShader_fs.glsl");
+            std::cout << "ShaderProgram" << shader_content_ptr->shader_program
+                      << std::endl;
+            auto entity = model_entity_factory.GetModelEntity(mesh_node,shader_content_ptr);
 
             // Make a main camera entity.
             std::shared_ptr<lunatic_engine::MainCamera> main_camera_ptr =

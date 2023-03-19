@@ -2,7 +2,7 @@
 
 namespace lunatic_engine {
 std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
-    std::shared_ptr<model_loader::MeshNode> mesh_node) {
+    std::shared_ptr<model_loader::MeshNode> mesh_node,const std::shared_ptr<lunatic_engine::ShaderContent>& shader_content_ptr) {
     std::shared_ptr<Entity> entity_root = std::make_shared<Entity>();
     std::shared_ptr<Transform> transform = std::make_shared<Transform>();
     entity_root->AddComponent<Transform>(transform);
@@ -14,12 +14,12 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
         mesh->mesh_content = std::make_shared<MeshContent>(mesh_content);
         entity_root->AddComponent<Mesh>(mesh);
 
-        std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
+        /*std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
             resource_core->GetShaderContent(
                 "assets/Shader/TriangleShader_vs.glsl",
                 "assets/Shader/TriangleShader_fs.glsl");
         std::cout << "ShaderProgram" << shader_content_ptr->shader_program
-                  << std::endl;
+                  << std::endl;*/
 
         // Make a Material component.
         lunatic_engine::ImageContent temp_image_content =
@@ -34,7 +34,7 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
         entity_root->AddComponent<Material>(material_ptr);
     }
     for (auto i : mesh_node->child) {
-        auto entity_child = GetModelEntity(i);
+        auto entity_child = GetModelEntity(i,shader_content_ptr);
         entity_child->parent = entity_root;
         entity_root->child.emplace_back(entity_child);
     }

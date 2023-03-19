@@ -37,6 +37,8 @@ lunatic_engine::ResourceCore::GetShaderContent(
         CheckCompileErrors(fragment_shader, "FRAGMENT");
 
         shader_program = glCreateProgram();
+        std::cout << "Shader Program is" << shader_program << std::endl;
+
         glAttachShader(shader_program, vertex_shader);
         glAttachShader(shader_program, fragment_shader);
         glLinkProgram(shader_program);
@@ -50,6 +52,9 @@ lunatic_engine::ResourceCore::GetShaderContent(
     rendering_core->InsertResoureCommandGroup(create_shader_source);
     // Kind of barrier.
     while (!is_good) {
+        // TODO:Here should have a lock. Kind of PV operation. If we don't do
+        // so, the content would be get earlier than it has been spawned.
+        std::this_thread::yield();
     }
     shader_content->shader_program = shader_program;
     return shader_content;
