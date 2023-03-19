@@ -43,9 +43,9 @@ int main() {
 
             transform_ptr2->position_z = 15;
             transform_ptr2->position_x = 0;
-            transform_ptr2->position_y = 10;
+            transform_ptr2->position_y = 0;
 
-            glm::qua<float> temp(glm::radians(glm::vec3(-45, 10, 0)));
+            glm::qua<float> temp(glm::radians(glm::vec3(0, 0, 0)));
             transform_ptr2->rotation_w = temp.w;
             transform_ptr2->rotation_x = temp.x;
             transform_ptr2->rotation_y = temp.y;
