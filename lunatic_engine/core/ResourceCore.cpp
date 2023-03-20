@@ -6,6 +6,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #endif
 #include "ResourceCore.h"
+#include <atomic>
 #include <thread>
 #include "stb_image.h"
 std::shared_ptr<lunatic_engine::ShaderContent>
@@ -20,7 +21,7 @@ lunatic_engine::ResourceCore::GetShaderContent(
 
     std::shared_ptr<ShaderContent> shader_content =
         std::make_shared<ShaderContent>();
-    bool is_good = false;
+    std::atomic<bool> is_good = false;
 
     unsigned int shader_program;
     auto create_shader_source = [=, &is_good, &shader_program]() mutable {
@@ -54,7 +55,7 @@ lunatic_engine::ResourceCore::GetShaderContent(
     while (!is_good) {
         // TODO:Here should have a lock. Kind of PV operation. If we don't do
         // so, the content would be get earlier than it has been spawned.
-        std::this_thread::yield();
+        //std::this_thread::yield();
     }
     shader_content->shader_program = shader_program;
     return shader_content;
@@ -100,7 +101,8 @@ void lunatic_engine::ResourceCore::CheckCompileErrors(GLuint shader,
 }
 lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
     lunatic_engine::model_loader::Mesh mesh) {
-    bool is_good = false;
+    std::atomic<bool> is_good = false;
+    //bool is_good = false;
     unsigned int vao;
     unsigned int vbo;
     unsigned int ebo;
@@ -158,7 +160,7 @@ lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
     // the rendering loop to interact with GLAD.
     rendering_core->InsertResoureCommandGroup(get_mesh_vao_command);
     // A kind of barrier, like future.
-    while (!is_good) std::this_thread::yield();
+    while (!is_good) ;
     MeshContent res{};
     res.triangle_count = mesh.triangle_count;
     std::cout << "Having VAO:" << vao << std::endl;
@@ -168,7 +170,7 @@ lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
 lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
     std::string directory) {
     unsigned int texture;
-    bool is_texture_ok = false;
+    std::atomic<bool> is_texture_ok = false;
     auto get_texture_content = [=, &texture, &is_texture_ok]() {
         int width;
         int height;
@@ -206,6 +208,6 @@ lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
         is_texture_ok = true;
     };
     rendering_core->InsertResoureCommandGroup(get_texture_content);
-    while (!is_texture_ok) std::this_thread::yield();
+    while (!is_texture_ok);
     return ImageContent(texture);
 }
