@@ -34,6 +34,8 @@ int main() {
                 resource_core->GetShaderContent(
                     "assets/Shader/TriangleShader_vs.glsl",
                     "assets/Shader/TriangleShader_fs.glsl");
+            // TODO: The Resource core should not only get the resource itself,
+            // but should also try to manage the resource.
             std::cout << "ShaderProgram" << shader_content_ptr->shader_program
                       << std::endl;
             lunatic_engine::ImageContent temp_image_content =
@@ -73,6 +75,7 @@ int main() {
     });
     // Simulate the Lunatic Gaming Context.
     while (rendering_core->IsRenderEnabled()) {
+        //TODO: Make a lunatic engine.
         camera_system.OnTick(1);
         rendering_system->OnTick(1);
         rendering_core->RenderTick();

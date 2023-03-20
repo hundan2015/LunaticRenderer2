@@ -1,42 +1,42 @@
 #include "ModelEntityFactory.h"
-
+#include "fmt/core.h"
 namespace lunatic_engine {
 std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
-    std::shared_ptr<model_loader::MeshNode> mesh_node,
+    const std::shared_ptr<model_loader::MeshNode>& mesh_node,
     const std::shared_ptr<lunatic_engine::ShaderContent>& shader_content_ptr,
-    std::shared_ptr<lunatic_engine::ImageContent> temp_image_content) {
+    const std::shared_ptr<lunatic_engine::ImageContent>& temp_image_content) {
     std::shared_ptr<Entity> entity_root = std::make_shared<Entity>();
     std::shared_ptr<Transform> transform = std::make_shared<Transform>();
     entity_root->AddComponent<Transform>(transform);
     if (mesh_node->mesh) {
-        std::cout << "Have mesh!" << mesh_node->mesh->triangle_count
-                  << std::endl;
+        std::cout << fmt::format("Have a Mesh! The triangle count is {}\n",
+                                 mesh_node->mesh->triangle_count);
         std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
+        /**
+         * @warning this part is super shit! First it get a mesh_content then it
+         * use copy function to make a mesh content. In fact, these
+         * assimpLoader::mesh content should get in the resource core, and not
+         * expose to the function layer.
+         */
         lunatic_engine::MeshContent mesh_content =
             resource_core->GetMeshContent(*(mesh_node->mesh));
         mesh->mesh_content = std::make_shared<MeshContent>(mesh_content);
         entity_root->AddComponent<Mesh>(mesh);
+        // Shit part end.
 
-        /*std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
-            resource_core->GetShaderContent(
-                "assets/Shader/TriangleShader_vs.glsl",
-                "assets/Shader/TriangleShader_fs.glsl");
-        std::cout << "ShaderProgram" << shader_content_ptr->shader_program
-                  << std::endl;*/
-
-        // Make a Material component.
-        /*lunatic_engine::ImageContent temp_image_content =
-            resource_core->GetImageContent("assets/Textures/Chess.jpg");*/
         std::shared_ptr<lunatic_engine::Material> material_ptr =
             std::make_shared<lunatic_engine::Material>();
         material_ptr->shader_content = shader_content_ptr;
-        material_ptr->name_image_content_map.insert(std::make_pair(
-            "_Albedo", temp_image_content));
+        // In this engine's default pipeline, we use _Albedo to describe the
+        // diffuse map.
+        material_ptr->name_image_content_map.insert(
+            std::make_pair("_Albedo", temp_image_content));
 
         entity_root->AddComponent<Material>(material_ptr);
     }
-    for (auto i : mesh_node->child) {
-        auto entity_child = GetModelEntity(i, shader_content_ptr, temp_image_content);
+    for (auto& mesh_node_child : mesh_node->child) {
+        auto entity_child = GetModelEntity(mesh_node_child, shader_content_ptr,
+                                           temp_image_content);
         entity_child->parent = entity_root;
         entity_root->child.emplace_back(entity_child);
     }
