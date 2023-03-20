@@ -36,8 +36,13 @@ int main() {
                     "assets/Shader/TriangleShader_fs.glsl");
             std::cout << "ShaderProgram" << shader_content_ptr->shader_program
                       << std::endl;
-            auto entity = model_entity_factory.GetModelEntity(mesh_node,shader_content_ptr);
-
+            lunatic_engine::ImageContent temp_image_content =
+                resource_core->GetImageContent("assets/Textures/Chess.jpg");
+            auto entity = model_entity_factory.GetModelEntity(
+                mesh_node, shader_content_ptr,
+                std::make_shared<lunatic_engine::ImageContent>(
+                    temp_image_content));
+            mesh_node.reset();
             // Make a main camera entity.
             std::shared_ptr<lunatic_engine::MainCamera> main_camera_ptr =
                 std::make_shared<lunatic_engine::MainCamera>();
@@ -49,7 +54,7 @@ int main() {
 
             transform_ptr2->position_z = 15;
             transform_ptr2->position_x = 0;
-            transform_ptr2->position_y = 0;
+            transform_ptr2->position_y = 5;
 
             glm::qua<float> temp(glm::radians(glm::vec3(0, 0, 0)));
             transform_ptr2->rotation_w = temp.w;
