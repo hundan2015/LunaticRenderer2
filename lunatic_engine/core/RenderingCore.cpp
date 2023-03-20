@@ -65,3 +65,17 @@ bool lunatic_engine::RenderingCore::InitOpenGL() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     return true;
 }
+bool lunatic_engine::RenderingCore::IsRenderEnabled() const {
+    return glfwWindowShouldClose(window_) == 0;
+}
+void lunatic_engine::RenderingCore::InsertResoureCommandGroup(
+    const std::function<void()>& resource_command_group_lambda) {
+    static std::mutex locker;
+    locker.lock();
+    resource_command_group_queue_.push(resource_command_group_lambda);
+    locker.unlock();
+}
+void lunatic_engine::RenderingCore::SwapRenderingQueue() {
+    // Using move trying to make it faster.
+    command_group_queuePrev_ = std::move(command_group_queue_);
+}

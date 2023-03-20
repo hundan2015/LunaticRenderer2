@@ -1,7 +1,4 @@
 #include <iostream>
-#include <memory>
-#include <string>
-#define DEBUG_BARRIER
 #include "core/LunaticEngine.h"
 
 using lunatic_engine::RenderingCore;

@@ -13,9 +13,7 @@ void lunatic_engine::LunaticEngine::StartEngine() const {
     rendering_core_->InitOpenGL();
     //  Fuck a main loop.
     auto end_bar = []() noexcept {
-#ifdef DEBUG_BARRIER
         std::cout << "Frame Barrier reached." << std::endl;
-#endif
     };
     auto time_last = static_cast<float>(glfwGetTime());
     bool is_engine_shit = true;
@@ -28,6 +26,7 @@ void lunatic_engine::LunaticEngine::StartEngine() const {
      * loop to use the barrier. Therefore the barrier can't be accessed by the
      * function outside.
      */
+
     auto logic_loop_deco = [&]() {
         while (is_engine_shit) {
             const auto time_now = static_cast<float>(glfwGetTime());
@@ -67,11 +66,12 @@ void lunatic_engine::LunaticEngine::StartEngine() const {
 lunatic_engine::LunaticEngine::LunaticEngine() {
     //
     entity_manager_ = std::make_shared<EntityManager>();
-    entity_manager_->RegisterSystem(std::make_shared<TestSystem>());
+    //entity_manager_->RegisterSystem(std::make_shared<TestSystem>());
     rendering_core_ = std::make_shared<RenderingCore>();
+    resource_core_ = std::make_shared<ResourceCore>();
+
 }
 
 void lunatic_engine::LunaticEngine::renderLoop() const {
     rendering_core_->RenderTick();
 }
-

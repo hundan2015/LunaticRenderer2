@@ -24,18 +24,11 @@ class RenderingCore {
      * @brief Return the Render is rendering.
      * WTF is [[nodiscard]]??
      */
-    [[nodiscard]] bool IsRenderEnabled() const {
-        return glfwWindowShouldClose(window_) == 0;
-    }
+    [[nodiscard]] bool IsRenderEnabled() const;
     void InsertRenderCommandGroup(
         const std::function<void()>& command_group_lambda);
     void InsertResoureCommandGroup(
-        const std::function<void()>& resource_command_group_lambda) {
-        static std::mutex locker;
-        locker.lock();
-        resource_command_group_queue_.push(resource_command_group_lambda);
-        locker.unlock();
-    }
+        const std::function<void()>& resource_command_group_lambda);
 
     /**
      * @brief RenderTick is defined to be double buffer in the Render System.
@@ -45,10 +38,7 @@ class RenderingCore {
     // We only hope the RenderingCore itself have its own life cycle.
     static std::shared_ptr<RenderingCore> rendering_manager_singleton_ref_;
 
-    void SwapRenderingQueue() {
-        // Using move trying to make it faster.
-        command_group_queuePrev_ = std::move(command_group_queue_);
-    }
+    void SwapRenderingQueue();
 
    private:
     std::mutex command_lock_;

@@ -51,7 +51,7 @@ class System {
     }
 
    public:
-    int mPriority;
+    int priority;
     const std::string kName;
     void RegisterToSystem(const std::shared_ptr<Entity>& entity) {
         targets_.insert(entity);

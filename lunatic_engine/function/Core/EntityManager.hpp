@@ -23,7 +23,7 @@ class EntityManager {
 
     std::set<std::shared_ptr<Entity>> entity_list;
     std::queue<std::shared_ptr<Entity>> need_to_destroy;
-    std::shared_ptr<Entity> main_camera;
+    //std::shared_ptr<Entity> main_camera;
     // TODO: These should move to a new class named SystemManager.
     void RegisterEntitiesToSystem(std::shared_ptr<Entity> entity) {
         std::queue<std::shared_ptr<Entity>> entity_queue;
