@@ -18,6 +18,10 @@ add_executable(JsonDemo JsonDemo.cpp)
 target_link_libraries(JsonDemo PRIVATE lunatic_core)
 target_link_libraries(JsonDemo PRIVATE LIB_COMPONENT)
 
+add_executable(MemoryDemo MemoryDemo.cpp)
+target_link_libraries(MemoryDemo PRIVATE lunatic_core)
+target_link_libraries(MemoryDemo PRIVATE LIB_COMPONENT)
+
 # Copy method.
 add_custom_command(TARGET RenderingSystemTestT
         POST_BUILD

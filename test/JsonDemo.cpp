@@ -22,6 +22,7 @@ struct BStruct : Component {
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TrueComponent, x, y);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(BStruct, x, y, z, a, vec);
 std::map<std::string, std::function<std::unique_ptr<Component>(json)>> shit;
+
 template <typename T>
 class RegisterShit {
    public:
