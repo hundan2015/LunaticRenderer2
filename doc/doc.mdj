@@ -3560,7 +3560,7 @@
 											"top": 1526,
 											"width": 319.05859375,
 											"height": 13,
-											"text": "-name_: string",
+											"text": "-name: string",
 											"horizontalAlignment": 0
 										},
 										{
@@ -10841,7 +10841,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGG/5LHOD+GzqU="
 							},
-							"name": "name_",
+							"name": "name",
 							"visibility": "private",
 							"type": "string"
 						},

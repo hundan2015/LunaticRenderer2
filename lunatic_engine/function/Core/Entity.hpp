@@ -1,8 +1,8 @@
 #pragma once
 
+#include <fmt/core.h>
 #include <algorithm>
 #include <cmath>
-#include <fmt/core.h>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -19,14 +19,14 @@
 namespace lunatic_engine {
 class Entity {
    private:
-    std::string name_;
-
    public:
+    std::string name;
     std::weak_ptr<Entity> parent;
     std::vector<std::shared_ptr<Entity>> child;
 
+    Entity(std::string name_) : name(name_){};
     Entity() = default;
-    std::string GetName() { return name_; }
+    std::string GetName() { return name; }
     bool is_dirty = false;
     std::map<std::string, std::shared_ptr<Component>> components;
     template <typename T>
@@ -37,7 +37,7 @@ class Entity {
             return std::static_pointer_cast<T>(result->second);
         }
         std::string err_message =
-            fmt::format("WARNING::Entity {} have no {}", name_, component_id);
+            fmt::format("WARNING::Entity {} have no {}", name, component_id);
         std::cout << err_message << std::endl;
         return nullptr;
     }
@@ -63,7 +63,7 @@ class Entity {
     void AddComponent(std::shared_ptr<T> component) {
         std::shared_ptr<Component> component_temp =
             std::static_pointer_cast<Component>(component);
-        components.insert(std::make_pair(typeid(T).name(), component_temp));
+        components.insert(std::make_pair(typeid(*component).name(), component_temp));
         // component_temp->entity = std::make_shared<Entity>(this);
         is_dirty = true;
     }

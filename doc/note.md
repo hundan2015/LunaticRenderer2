@@ -7,14 +7,14 @@
 classDiagram
     shit ..> Entity
     class Entity {
-        - string name_
+        - string name
         + weak_ptr<Entity> parent
         + vector<shared_ptr<Entity>> child
         + weak_ptr<EntityManager> entity_manager
     }
 
     class shit {
-        + string name_
+        + string name
         + Entity shit
     }
 ```

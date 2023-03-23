@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.hpp"
-#include "Entity.hpp"
 #include "System.hpp"
 #include "map"
 using json = nlohmann::json;
@@ -9,6 +8,15 @@ struct ComponentMeta {
     std::string name;
     json component_data;
 };
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ComponentMeta, name, component_data);
+
+struct EntityMeta {
+    std::string name;
+    std::vector<ComponentMeta> components;
+    std::vector<EntityMeta> child;
+};
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(EntityMeta, name, components, child);
+
 class RegistryStation {
     std::map<std::string, std::function<std::shared_ptr<Component>(json)>>
         registry_map_;
@@ -50,8 +58,27 @@ class RegistryStation {
             (func->second)(component_wrapper.component_data);
         return target_component;
     }
+    std::shared_ptr<Entity> GetEntity(EntityMeta& entity_meta) {
+        // auto shit = ;
+        // Must use the Entity(name) constructor, or get the error.
+        std::shared_ptr<Entity> entity_root(new Entity("temp"));
+        entity_root->name = entity_meta.name;
+        for (auto& component_meta : entity_meta.components) {
+            auto component_ptr = GetComponent(component_meta);
+            // auto shit = decltype(*component_ptr);
+            std::cout << typeid(*component_ptr).name() << std::endl;
+            entity_root->AddComponent(component_ptr);
+        }
+        for (auto& child_entity : entity_meta.child) {
+            entity_root->child.emplace_back(GetEntity(child_entity));
+        }
+        return entity_root;
+    }
 };
-
+/**
+ * Component, System need to be registered.
+ * @tparam T
+ */
 template <typename T>
 class RegisterHelper {
    public:
