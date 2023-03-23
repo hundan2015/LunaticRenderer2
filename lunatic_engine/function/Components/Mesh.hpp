@@ -26,13 +26,8 @@ class Mesh : public Component {
     // static RegisterComponent<Mesh> RegisterComponent;
     std::string mesh_dir;
     int mesh_num;
-    std::shared_ptr<lunatic_engine::MeshContent> mesh_content;
+    std::shared_ptr<lunatic_engine::MeshContent> mesh_content = nullptr;
 };
-inline void to_json(json& jsonObject, const Mesh& mesh) {
-    jsonObject = json{{"meshDir", mesh.mesh_dir}};
-}
-inline void from_json(const json& jsonObject, Mesh& mesh) {
-    jsonObject.at("meshDir").get_to(mesh.mesh_dir);
-    // OpenGL Functions
-}
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Mesh, mesh_dir, mesh_num);
+static RegisterHelper<Mesh> mesh_helper("Mesh");
 }  // namespace lunatic_engine

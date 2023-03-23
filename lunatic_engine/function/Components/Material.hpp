@@ -29,7 +29,8 @@ class Material : public Component {
     std::string shader_fs_dir;
     std::shared_ptr<lunatic_engine::ShaderContent> shader_content;
     std::map<std::string, std::string> name_dir_map;
-    std::map<std::string, std::shared_ptr<lunatic_engine::ImageContent>> name_image_content_map;
+    std::map<std::string, std::shared_ptr<lunatic_engine::ImageContent>>
+        name_image_content_map;
     /**
      * @brief Going to set content to a shader.
      * @warning This function has been wrapped into a rendering command. So it
@@ -63,6 +64,9 @@ class Material : public Component {
         }
     }
 };
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Material, shader_vs_dir, shader_fs_dir,
+                                   name_dir_map);
+static RegisterHelper<Material> material_helper("Material");
 }  // namespace lunatic_engine
 
 // How to register a object?

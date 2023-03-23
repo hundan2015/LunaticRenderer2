@@ -7,6 +7,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <ostream>
 #include "../../core/RenderingCore.h"
+#include "../../core/ResourceCore.h"
 #include "../Components/Material.hpp"
 #include "../Components/Mesh.hpp"
 #include "../Components/Transform.h"
@@ -20,7 +21,6 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/transform.hpp"
 using json = nlohmann::json;
-// TODO(Symbolic): Remade the directory!!!!
 namespace lunatic_engine {
 
 class RenderingSystem : public System {
@@ -59,6 +59,7 @@ class RenderingSystem : public System {
     }
     std::weak_ptr<EntityManager> entity_manager;
     std::weak_ptr<RenderingCore> rendering_core;
+    std::weak_ptr<ResourceCore> resource_core;
 
     void OnStart() override {}
     void GetWorldTransform(std::shared_ptr<Transform>& transform,
@@ -82,7 +83,26 @@ class RenderingSystem : public System {
             std::shared_ptr<Mesh> mesh = entity->GetComponent<Mesh>();
             std::shared_ptr<Material> material =
                 entity->GetComponent<Material>();
-
+            // Init Mesh and material component.
+            if (mesh->mesh_content == nullptr) {
+                // TODO: make a mesh content getter.
+            }
+            if (material->shader_content == nullptr) {
+                material->shader_content =
+                    resource_core.lock()->GetShaderContent(
+                        material->shader_vs_dir, material->shader_fs_dir);
+            }
+            if (material->name_image_content_map.empty()) {
+                // TODO:TEST here!
+                auto resource_share_ptr = resource_core.lock();
+                for (auto& name : material->name_dir_map) {
+                    auto image_content =
+                        resource_share_ptr->GetImageContent(name.second);
+                    material->name_image_content_map.insert(std::make_pair(
+                        name.first,
+                        std::make_shared<ImageContent>(image_content)));
+                }
+            }
             // Because an Entity have only a weak_ptr parent, which can't be
             // nullptr. So I transfer it into the shared_ptr first.
             std::shared_ptr<Entity> parent = entity->parent.lock();
@@ -117,6 +137,7 @@ class RenderingSystem : public System {
             glm::mat4 perspective = glm::perspective(
                 glm::radians(45.0f), (float)800 / (float)600, 0.1f, 100.0f);
             auto final_mat = perspective * view * model;
+
             // Maybe the rendering function should belong to the rendering core?
             auto rendering_function = [=]() {
                 glUseProgram(material->shader_content->shader_program);
@@ -133,6 +154,7 @@ class RenderingSystem : public System {
                                GL_UNSIGNED_INT, nullptr);
                 glBindVertexArray(0);
             };
+
             rendering_core.lock()->InsertRenderCommandGroup(rendering_function);
         }
     }
