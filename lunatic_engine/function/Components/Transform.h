@@ -4,11 +4,11 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include "../Core/Component.hpp"
+#include "../Core/RegistryStation.h"
 #include "../Core/System.hpp"
 #include "glm/fwd.hpp"
-
 namespace lunatic_engine {
-// Need a viewmodel of the Componnet.
+// Need a view model of the Component.
 /**
  * @brief Transform store an Entity's position, rotation and scale information.
  *
@@ -36,6 +36,8 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position_x, position_y,
                                    position_z, scale_x, scale_y, scale_z,
                                    rotation_w, rotation_x, rotation_y,
                                    rotation_z)
+static RegisterHelper<Transform> transform_register_helper("Transform");
+
 
 class TransformManager {
    public:

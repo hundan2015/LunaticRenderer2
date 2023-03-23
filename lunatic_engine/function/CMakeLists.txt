@@ -1,9 +1,9 @@
 aux_source_directory(Systems DIR_COPONENT)
 aux_source_directory(.hpp DIR_COPONENT_HPP)
 aux_source_directory(.h DIR_COPONENT_H)
-
+aux_source_directory(Components/.* DIR_COMPONENT_CPP)
 include_directories("../core")
-add_library(LIB_COMPONENT STATIC ${DIR_COPONENT} ${DIR_COPONENT_HPP} ${DIR_COPONENT_H} Tools/ModelEntityFactory.h Tools/ModelEntityFactory.cpp)
+add_library(LIB_COMPONENT STATIC ${DIR_COPONENT} ${DIR_COPONENT_HPP} ${DIR_COPONENT_H} Tools/ModelEntityFactory.h Tools/ModelEntityFactory.cpp Core/RegistryStation.cpp ${DIR_COMPONENT_CPP} Components/Transform.cpp)
 #find_library(lunatic_core "../core")
 #add_subdirectory("./Core")
 find_package(glad CONFIG REQUIRED)
