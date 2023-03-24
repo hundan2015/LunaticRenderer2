@@ -4,7 +4,8 @@ namespace lunatic_engine {
 std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
     const std::shared_ptr<model_loader::MeshNode>& mesh_node,
     const std::shared_ptr<lunatic_engine::ShaderContent>& shader_content_ptr,
-    const std::shared_ptr<lunatic_engine::ImageContent>& temp_image_content) {
+    const std::shared_ptr<lunatic_engine::ImageContent>& temp_image_content,
+    int mesh_counter = 0) {
     std::shared_ptr<Entity> entity_root = std::make_shared<Entity>();
     std::shared_ptr<Transform> transform = std::make_shared<Transform>();
     entity_root->AddComponent<Transform>(transform);
@@ -21,6 +22,8 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
         lunatic_engine::MeshContent mesh_content =
             resource_core->GetMeshContent(*(mesh_node->mesh));
         mesh->mesh_content = std::make_shared<MeshContent>(mesh_content);
+        mesh->mesh_num = mesh_counter;
+        mesh_counter++;
         entity_root->AddComponent<Mesh>(mesh);
         // Shit part end.
 
@@ -36,7 +39,7 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
     }
     for (auto& mesh_node_child : mesh_node->child) {
         auto entity_child = GetModelEntity(mesh_node_child, shader_content_ptr,
-                                           temp_image_content);
+                                           temp_image_content, mesh_counter);
         entity_child->parent = entity_root;
         entity_root->child.emplace_back(entity_child);
     }

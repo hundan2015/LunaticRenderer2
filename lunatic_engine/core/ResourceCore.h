@@ -8,10 +8,13 @@
 #include "content/ShaderContent.h"
 #include "fstream"
 #include "glad/glad.h"
+#include "map"
 
 namespace lunatic_engine {
 
 class ResourceCore {
+    std::map<std::string ,model_loader::MeshInfo> mesh_info_map;
+
    public:
     std::shared_ptr<RenderingCore> rendering_core;
     /**
@@ -36,6 +39,8 @@ class ResourceCore {
 
     MeshContent GetMeshContent(model_loader::Mesh mesh);
     ImageContent GetImageContent(std::string directory);
+
+    void LoadModelInfo(std::string model_dir) {}
 };
 
 }  // namespace lunatic_engine
