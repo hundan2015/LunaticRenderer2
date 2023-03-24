@@ -13,7 +13,12 @@
 namespace lunatic_engine {
 
 class ResourceCore {
-    std::map<std::string ,model_loader::MeshInfo> mesh_info_map;
+    std::mutex mesh_info_map_mutex_;
+    std::map<std::string, model_loader::MeshInfo> mesh_info_map_;
+    std::mutex image_content_map_mutex_;
+    std::map<std::string, std::shared_ptr<ImageContent>> image_content_map_;
+    std::mutex shader_content_map_mutex_;
+    std::map<std::string, std::shared_ptr<ShaderContent>> shader_content_map_;
 
    public:
     std::shared_ptr<RenderingCore> rendering_core;
@@ -26,7 +31,7 @@ class ResourceCore {
      */
     [[nodiscard]] std::shared_ptr<lunatic_engine::ShaderContent>
     GetShaderContent(const std::string& vertex_shader_dir,
-                     const std::string& fragment_shader_dir) const;
+                     const std::string& fragment_shader_dir);
     static std::string GetShaderFileString(const std::string& shader_dir);
     /**
      *
@@ -38,7 +43,7 @@ class ResourceCore {
     static void CheckCompileErrors(GLuint shader, const std::string& type);
 
     MeshContent GetMeshContent(model_loader::Mesh mesh);
-    ImageContent GetImageContent(std::string directory);
+    ImageContent GetImageContent(const std::string& image_dir);
 
     void LoadModelInfo(std::string model_dir) {}
 };

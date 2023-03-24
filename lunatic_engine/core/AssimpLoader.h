@@ -60,7 +60,8 @@ class AssimpLoader {
         }
         if (!mesh_temp.vertices.empty()) {
             mesh_node->mesh = std::make_shared<Mesh>(mesh_temp);
-            mesh_info->mesh_list.emplace_back(mesh_node->mesh);
+            // TODO:mesh_info! do something!
+            // mesh_info->mesh_list.emplace_back(mesh_node->mesh);
         }
         for (unsigned int i = 0; i < node->mNumChildren; i++) {
             mesh_node->child.emplace_back(
@@ -102,7 +103,7 @@ class AssimpLoader {
         }
         return res;
     }
-
+    //
     std::shared_ptr<MeshNode> GetMeshNode(const std::string &dir) {
         LoadModel(dir);
         return mesh_root_;

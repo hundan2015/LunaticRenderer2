@@ -43,7 +43,8 @@ int main() {
             auto entity = model_entity_factory.GetModelEntity(
                 mesh_node, shader_content_ptr,
                 std::make_shared<lunatic_engine::ImageContent>(
-                    temp_image_content));
+                    temp_image_content),
+                0);
             mesh_node.reset();
             // Make a main camera entity.
             std::shared_ptr<lunatic_engine::MainCamera> main_camera_ptr =
@@ -75,7 +76,7 @@ int main() {
     });
     // Simulate the Lunatic Gaming Context.
     while (rendering_core->IsRenderEnabled()) {
-        //TODO: Make a lunatic engine.
+        // TODO: Make a lunatic engine.
         camera_system.OnTick(1);
         rendering_system->OnTick(1);
         rendering_core->RenderTick();

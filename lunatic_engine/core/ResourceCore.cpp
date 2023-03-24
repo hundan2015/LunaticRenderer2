@@ -12,8 +12,16 @@
 std::shared_ptr<lunatic_engine::ShaderContent>
 lunatic_engine::ResourceCore::GetShaderContent(
     const std::string& vertex_shader_dir,
-    const std::string& fragment_shader_dir) const {
+    const std::string& fragment_shader_dir) {
     std::string vertex_shader_source;
+    std::string shader_id = vertex_shader_dir + "||" + fragment_shader_dir;
+    {
+        std::lock_guard lock_guard(shader_content_map_mutex_);
+        auto result = shader_content_map_.find(shader_id);
+        if (result != shader_content_map_.end()) {
+            return result->second;
+        }
+    }
     vertex_shader_source = GetShaderFileString(vertex_shader_dir);
 
     std::string fragment_shader_source;
@@ -55,9 +63,13 @@ lunatic_engine::ResourceCore::GetShaderContent(
     while (!is_good) {
         // TODO:Here should have a lock. Kind of PV operation. If we don't do
         // so, the content would be get earlier than it has been spawned.
-        //std::this_thread::yield();
+        // std::this_thread::yield();
     }
     shader_content->shader_program = shader_program;
+    {
+        std::lock_guard lock_guard(shader_content_map_mutex_);
+        shader_content_map_.insert(std::make_pair(shader_id, shader_content));
+    }
     return shader_content;
 }
 std::string lunatic_engine::ResourceCore::GetShaderFileString(
@@ -102,7 +114,7 @@ void lunatic_engine::ResourceCore::CheckCompileErrors(GLuint shader,
 lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
     lunatic_engine::model_loader::Mesh mesh) {
     std::atomic<bool> is_good = false;
-    //bool is_good = false;
+    // bool is_good = false;
     unsigned int vao;
     unsigned int vbo;
     unsigned int ebo;
@@ -160,7 +172,8 @@ lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
     // the rendering loop to interact with GLAD.
     rendering_core->InsertResoureCommandGroup(get_mesh_vao_command);
     // A kind of barrier, like future.
-    while (!is_good) ;
+    while (!is_good)
+        ;
     MeshContent res{};
     res.triangle_count = mesh.triangle_count;
     std::cout << "Having VAO:" << vao << std::endl;
@@ -168,7 +181,19 @@ lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
     return res;
 }
 lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
-    std::string directory) {
+    const std::string& image_dir) {
+    // The brace is necessary! To use the lock guard auto free the lock!
+    {
+        std::lock_guard lock_guard(image_content_map_mutex_);
+        // If it has been loaded once, we should find it in the map.
+        auto search_result = image_content_map_.find(image_dir);
+
+        if (search_result != image_content_map_.end()) {
+            return *(search_result->second);
+        }
+    }
+
+    // The content's first load.
     unsigned int texture;
     std::atomic<bool> is_texture_ok = false;
     auto get_texture_content = [=, &texture, &is_texture_ok]() {
@@ -176,7 +201,7 @@ lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
         int height;
         int nr_channel;
         unsigned char* data = nullptr;
-        const char* directory_str = directory.c_str();
+        const char* directory_str = image_dir.c_str();
         data = stbi_load(directory_str, &width, &height, &nr_channel, 0);
         assert(data != nullptr);
         if (data == nullptr) {
@@ -208,6 +233,14 @@ lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
         is_texture_ok = true;
     };
     rendering_core->InsertResoureCommandGroup(get_texture_content);
-    while (!is_texture_ok);
-    return ImageContent(texture);
+    while (!is_texture_ok)
+        ;
+    ImageContent result(texture);
+    std::shared_ptr<ImageContent> image_content_ptr =
+        std::make_shared<ImageContent>(result);
+
+    image_content_map_mutex_.lock();
+    image_content_map_.insert(std::make_pair(image_dir, image_content_ptr));
+    image_content_map_mutex_.unlock();
+    return result;
 }
