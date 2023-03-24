@@ -28,8 +28,7 @@ int main() {
         {
             lunatic_engine::ModelEntityFactory model_entity_factory;
             model_entity_factory.resource_core = resource_core;
-            std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node =
-                assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");
+
             std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
                 resource_core->GetShaderContent(
                     "assets/Shader/TriangleShader_vs.glsl",
@@ -40,13 +39,19 @@ int main() {
                       << std::endl;
             lunatic_engine::ImageContent temp_image_content =
                 resource_core->GetImageContent("assets/Textures/Chess.jpg");
+
+            /*std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node
+               = assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");*/
+            auto mesh_info =
+                resource_core->GetMeshInfo("assets/Models/nanosuit.obj");
             auto entity = model_entity_factory.GetModelEntity(
-                mesh_node, shader_content_ptr,
+                mesh_info->root, shader_content_ptr,
                 std::make_shared<lunatic_engine::ImageContent>(
                     temp_image_content),
                 0);
-            mesh_node.reset();
-            // Make a main camera entity.
+
+            // mesh_node.reset();
+            //  Make a main camera entity.
             std::shared_ptr<lunatic_engine::MainCamera> main_camera_ptr =
                 std::make_shared<lunatic_engine::MainCamera>();
             std::shared_ptr<lunatic_engine::Transform> transform_ptr2 =
@@ -70,6 +75,13 @@ int main() {
             camera->AddComponent<lunatic_engine::Transform>(transform_ptr2);
 
             camera_system.RegisterToSystem(camera);
+
+            lunatic_engine::RegistryStation* registry_station =
+                lunatic_engine::RegistryStation::GetRegistryStation();
+            lunatic_engine::EntityMeta entity_meta =
+                registry_station->GetEntityMeta(entity);
+            json entity_json = entity_meta;
+            std::cout << entity_json << std::endl;
             entity_manager.RegisterEntitiesToSystem(entity);
             // rendering_system.RegisterToSystem(entity);
         }

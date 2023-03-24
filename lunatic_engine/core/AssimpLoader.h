@@ -23,12 +23,7 @@ class MeshNode {
     std::shared_ptr<Mesh> mesh = nullptr;
     std::vector<std::shared_ptr<MeshNode>> child;
 };
-// TODO: Here need some design! The mesh info is too foolish!
-class MeshInfo {
-   public:
-    std::shared_ptr<MeshNode> root;
-    std::vector<std::shared_ptr<Mesh>> mesh_list;
-};
+
 class AssimpLoader {
     std::shared_ptr<MeshNode> mesh_root_;
 
@@ -49,9 +44,8 @@ class AssimpLoader {
         // ProcessNode(scene->mRootNode, scene);
         mesh_root_ = ProcessNodeDeco(scene->mRootNode, scene);
     }
-    std::shared_ptr<MeshNode> ProcessNodeDeco(
-        aiNode *node, const aiScene *scene,
-        std::shared_ptr<MeshInfo> mesh_info = nullptr) {
+    std::shared_ptr<MeshNode> ProcessNodeDeco(aiNode *node,
+                                              const aiScene *scene) {
         auto mesh_node = std::make_shared<MeshNode>();
         auto mesh_temp = Mesh();
         for (unsigned int i = 0; i < node->mNumMeshes; i++) {
@@ -107,20 +101,6 @@ class AssimpLoader {
     std::shared_ptr<MeshNode> GetMeshNode(const std::string &dir) {
         LoadModel(dir);
         return mesh_root_;
-    }
-    std::shared_ptr<MeshInfo> GetMeshInfo(const std::string &dir) {
-        auto mesh_node_root = GetMeshNode(dir);
-        auto res = std::make_shared<MeshInfo>();
-        res->root = mesh_node_root;
-        DFSFunction(mesh_node_root, 0, res);
-        return res;
-    }
-    void DFSFunction(std::shared_ptr<MeshNode> root, int counter,
-                     std::shared_ptr<MeshInfo> &res) {
-        res->mesh_list.emplace_back(root->mesh);
-        for (auto &child_mesh : root->child) {
-            DFSFunction(child_mesh, counter + 1, res);
-        }
     }
 };
 

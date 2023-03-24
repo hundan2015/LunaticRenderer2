@@ -15,7 +15,7 @@ namespace lunatic_engine {
  */
 class Transform : public Component {
    public:
-    Transform() = default;
+    Transform() { name = "Transform"; };
     float position_x = 0;
     float position_y = 0;
     float position_z = 0;
@@ -37,7 +37,6 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position_x, position_y,
                                    rotation_w, rotation_x, rotation_y,
                                    rotation_z)
 static RegisterHelper<Transform> transform_register_helper("Transform");
-
 
 class TransformManager {
    public:

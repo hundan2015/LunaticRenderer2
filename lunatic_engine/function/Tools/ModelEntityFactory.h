@@ -14,5 +14,12 @@ class ModelEntityFactory {
         const std::shared_ptr<lunatic_engine::ImageContent>&
             temp_image_content_,
         int mesh_counter);
+    std::shared_ptr<Entity> GetModelEntity(
+        const std::shared_ptr<MeshContentNode>& mesh_node,
+        const std::shared_ptr<lunatic_engine::ShaderContent>&
+            shader_content_ptr,
+        const std::shared_ptr<lunatic_engine::ImageContent>&
+            temp_image_content_,
+        int mesh_counter);
 };
 }  // namespace lunatic_engine

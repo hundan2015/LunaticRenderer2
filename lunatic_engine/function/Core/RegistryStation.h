@@ -20,6 +20,8 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(EntityMeta, name, components, child);
 class RegistryStation {
     std::map<std::string, std::function<std::shared_ptr<Component>(json)>>
         registry_map_;
+    std::map<std::string, std::function<json(std::shared_ptr<Component>)>>
+        come_back_map_;
 
    public:
     void RegisterToMap(std::string name,
@@ -31,6 +33,17 @@ class RegistryStation {
             return;
         }
         registry_map_.insert(std::make_pair(name, func));
+    }
+    void RegisterToComeBackMap(
+        std::string name,
+        std::function<json(std::shared_ptr<Component>)> func) {
+        auto pre_search = come_back_map_.find(name);
+        if (pre_search != come_back_map_.end()) {
+            std::cout << "WARNING::" << name
+                      << " has been registerd to come back map." << std::endl;
+            return;
+        }
+        come_back_map_.insert(std::make_pair(name, func));
     }
     // RegistryStation(RegistryStation&) = delete;
     static RegistryStation* GetRegistryStation() {
@@ -62,7 +75,9 @@ class RegistryStation {
         // auto shit = ;
         // Must use the Entity(name) constructor, or get the error.
         std::shared_ptr<Entity> entity_root(new Entity("temp"));
-        entity_root->name = entity_meta.name;
+        if (entity_meta.name != "") {
+            entity_root->name = entity_meta.name;
+        }
         for (auto& component_meta : entity_meta.components) {
             auto component_ptr = GetComponent(component_meta);
             // auto shit = decltype(*component_ptr);
@@ -70,9 +85,37 @@ class RegistryStation {
             entity_root->AddComponent(component_ptr);
         }
         for (auto& child_entity : entity_meta.child) {
-            entity_root->child.emplace_back(GetEntity(child_entity));
+            auto child = GetEntity(child_entity);
+            child->parent = entity_root;
+            entity_root->child.emplace_back(child);
         }
         return entity_root;
+    }
+    EntityMeta GetEntityMeta(std::shared_ptr<Entity> entity) {
+        EntityMeta res;
+        res.name = entity->name;
+        for (auto& component : entity->components) {
+            ComponentMeta component_meta = GetComponentMeta(component.second);
+            res.components.emplace_back(component_meta);
+        }
+        for (auto child : entity->child) {
+            res.child.emplace_back(GetEntityMeta(child));
+        }
+        return res;
+    }
+    ComponentMeta GetComponentMeta(
+        const std::shared_ptr<Component>& component) {
+        ComponentMeta component_meta;
+        component_meta.name = component->name;
+        auto json_function = come_back_map_.find(component_meta.name);
+        if (json_function != come_back_map_.end()) {
+            component_meta.component_data = json_function->second(component);
+        } else {
+            std::cout << "ERROR::The component " << component_meta.name
+                      << "has not registered!" << std::endl;
+            abort();
+        }
+        return component_meta;
     }
 };
 /**
@@ -90,7 +133,14 @@ class RegisterHelper {
             std::shared_ptr<T> component_ptr = std::make_shared<T>(component);
             return (component_ptr);
         };
+        auto come_back_function = [](std::shared_ptr<Component> component) {
+            auto ptr = std::static_pointer_cast<T>(component);
+            json result_json = *ptr;
+            std::cout << "Come back result = " << result_json << std::endl;
+            return result_json;
+        };
         registry_station->RegisterToMap(name, generate_function);
+        registry_station->RegisterToComeBackMap(name, come_back_function);
         std::cout << name << " has been called to register." << std::endl;
     }
 };

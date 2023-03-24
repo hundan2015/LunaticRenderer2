@@ -34,4 +34,6 @@ int main() {
     cout << entity_meta_json << endl;
     cout << "Entity test. Transform x:" << transform_ptr_from_entity->position_x
          << endl;
+    json entity_meta_restore = reg->GetEntityMeta(entity);
+    cout << entity_meta_restore << endl;
 }

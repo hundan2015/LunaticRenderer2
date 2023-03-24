@@ -25,6 +25,7 @@
 namespace lunatic_engine {
 class Material : public Component {
    public:
+    Material() { name = "Material"; }
     std::string shader_vs_dir;
     std::string shader_fs_dir;
     std::shared_ptr<lunatic_engine::ShaderContent> shader_content;

@@ -23,7 +23,9 @@ class Mesh : public Component {
     void InitComponent() override {}
 
    public:
-    // static RegisterComponent<Mesh> RegisterComponent;
+    Mesh() {
+        name = "Mesh";
+    }  // static RegisterComponent<Mesh> RegisterComponent;
     std::string mesh_dir;
     int mesh_num;
     std::shared_ptr<lunatic_engine::MeshContent> mesh_content = nullptr;
