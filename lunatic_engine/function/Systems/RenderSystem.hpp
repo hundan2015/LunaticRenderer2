@@ -86,6 +86,14 @@ class RenderingSystem : public System {
             // Init Mesh and material component.
             if (mesh->mesh_content == nullptr) {
                 // TODO: make a mesh content getter.
+                auto resource_share_ptr = resource_core.lock();
+                if (!resource_share_ptr) {
+                    std::cout << "ERROR::Resource core fucked up!";
+                    abort();
+                }
+                auto mesh_info =
+                    resource_share_ptr->GetMeshInfo(mesh->mesh_dir);
+                mesh->mesh_content = mesh_info->mesh_list[mesh->mesh_num];
             }
             if (material->shader_content == nullptr) {
                 material->shader_content =
@@ -95,6 +103,10 @@ class RenderingSystem : public System {
             if (material->name_image_content_map.empty()) {
                 // TODO:TEST here!
                 auto resource_share_ptr = resource_core.lock();
+                if (!resource_share_ptr) {
+                    std::cout << "ERROR::Resource core fucked up!";
+                    abort();
+                }
                 for (auto& name : material->name_dir_map) {
                     auto image_content =
                         resource_share_ptr->GetImageContent(name.second);

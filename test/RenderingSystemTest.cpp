@@ -44,6 +44,8 @@ int main() {
                = assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");*/
             auto mesh_info =
                 resource_core->GetMeshInfo("assets/Models/nanosuit.obj");
+            // TODO: The model entity has no infomation! Need to add some
+            // mesh_dir,shader_dir,and image_dir
             auto entity = model_entity_factory.GetModelEntity(
                 mesh_info->root, shader_content_ptr,
                 std::make_shared<lunatic_engine::ImageContent>(

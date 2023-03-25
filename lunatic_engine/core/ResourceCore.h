@@ -68,9 +68,10 @@ class ResourceCore {
         std::shared_ptr<model_loader::MeshNode>& mesh_node, int& counter,
         std::vector<std::shared_ptr<MeshContent>>& mesh_list) {
         auto res = std::make_shared<MeshContentNode>();
-        res->num = counter;
-        counter++;
+
         if (mesh_node->mesh) {
+            res->num = counter;
+            counter++;
             res->mesh_content = std::make_shared<MeshContent>(
                 GetMeshContent(*(mesh_node->mesh)));
             mesh_list.emplace_back(res->mesh_content);
