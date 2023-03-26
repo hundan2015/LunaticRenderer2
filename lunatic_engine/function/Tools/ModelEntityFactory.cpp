@@ -45,6 +45,7 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
     }
     return entity_root;
 }
+
 std::shared_ptr<Entity> ModelEntityFactory::GetModelEntity(
     const std::shared_ptr<MeshContentNode>& mesh_node,
     const std::shared_ptr<lunatic_engine::ShaderContent>& shader_content_ptr,
@@ -57,9 +58,12 @@ std::shared_ptr<Entity> ModelEntityFactory::GetModelEntity(
         auto mesh_ptr = std::make_shared<Mesh>();
         mesh_ptr->mesh_content = mesh_node->mesh_content;
         mesh_ptr->mesh_num = mesh_node->num;
+        mesh_ptr->mesh_dir = mesh_node->mesh_dir;
         entity_root->AddComponent<Mesh>(mesh_ptr);
         std::shared_ptr<lunatic_engine::Material> material_ptr =
             std::make_shared<lunatic_engine::Material>();
+        material_ptr->shader_fs_dir = shader_content_ptr->fragment_shader_dir;
+        material_ptr->shader_vs_dir = shader_content_ptr->vertex_shader_dir;
         material_ptr->shader_content = shader_content_ptr;
         // In this engine's default pipeline, we use _Albedo to describe the
         // diffuse map.

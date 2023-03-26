@@ -65,6 +65,8 @@ lunatic_engine::ResourceCore::GetShaderContent(
         // so, the content would be get earlier than it has been spawned.
         // std::this_thread::yield();
     }
+    shader_content->vertex_shader_dir = vertex_shader_dir;
+    shader_content->fragment_shader_dir = fragment_shader_dir;
     shader_content->shader_program = shader_program;
     {
         std::lock_guard lock_guard(shader_content_map_mutex_);
@@ -236,6 +238,7 @@ lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
     while (!is_texture_ok)
         ;
     ImageContent result(texture);
+    result.image_dir = image_dir;
     std::shared_ptr<ImageContent> image_content_ptr =
         std::make_shared<ImageContent>(result);
 

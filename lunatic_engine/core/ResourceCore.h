@@ -56,7 +56,9 @@ class ResourceCore {
         auto mesh_node_root = assimp_loader.GetMeshNode(model_dir);
         int counter = 0;
         auto result = std::make_shared<MeshInfo>();
-        auto root = DFSMeshInfo(mesh_node_root, counter, result->mesh_list);
+        result->mesh_dir = model_dir;
+        auto root =
+            DFSMeshInfo(mesh_node_root, counter, result->mesh_list, model_dir);
         result->root = root;
         {
             std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
@@ -66,7 +68,8 @@ class ResourceCore {
     }
     std::shared_ptr<MeshContentNode> DFSMeshInfo(
         std::shared_ptr<model_loader::MeshNode>& mesh_node, int& counter,
-        std::vector<std::shared_ptr<MeshContent>>& mesh_list) {
+        std::vector<std::shared_ptr<MeshContent>>& mesh_list,
+        const std::string& mesh_dir) {
         auto res = std::make_shared<MeshContentNode>();
 
         if (mesh_node->mesh) {
@@ -74,11 +77,13 @@ class ResourceCore {
             counter++;
             res->mesh_content = std::make_shared<MeshContent>(
                 GetMeshContent(*(mesh_node->mesh)));
+            res->mesh_dir = mesh_dir;
             mesh_list.emplace_back(res->mesh_content);
         }
 
         for (auto child : mesh_node->child) {
-            res->children.emplace_back(DFSMeshInfo(child, counter, mesh_list));
+            res->children.emplace_back(
+                DFSMeshInfo(child, counter, mesh_list, mesh_dir));
         }
         return res;
     }

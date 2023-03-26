@@ -12,10 +12,12 @@ int main() {
     std::shared_ptr<lunatic_engine::ResourceCore> resource_core =
         std::make_shared<lunatic_engine::ResourceCore>();
     resource_core->rendering_core = rendering_core;
+
     lunatic_engine::EntityManager entity_manager;
 
     std::shared_ptr<lunatic_engine::RenderingSystem> rendering_system =
         std::make_shared<lunatic_engine::RenderingSystem>(rendering_core);
+    rendering_system->resource_core = resource_core;
     entity_manager.RegisterSystem(rendering_system);
     lunatic_engine::CameraSystem camera_system;
     auto render_command_test = []() { std::cout << "Ticking!" << std::endl; };
@@ -84,7 +86,8 @@ int main() {
                 registry_station->GetEntityMeta(entity);
             json entity_json = entity_meta;
             std::cout << entity_json << std::endl;
-            entity_manager.RegisterEntitiesToSystem(entity);
+            auto entity_cp = registry_station->GetEntity(entity_meta);
+            entity_manager.RegisterEntitiesToSystem(entity_cp);
             // rendering_system.RegisterToSystem(entity);
         }
     });
