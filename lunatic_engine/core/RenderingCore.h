@@ -39,14 +39,17 @@ class RenderingCore {
     static std::shared_ptr<RenderingCore> rendering_manager_singleton_ref_;
 
     void SwapRenderingQueue();
+    void ResourceTick();
 
    private:
     std::mutex command_lock_;
     std::mutex command_prev_lock_;
     std::mutex resource_command_lock_;
+    std::mutex openGL_lock_;
     std::queue<std::function<void()>> command_group_queue_;
     std::queue<std::function<void()>> resource_command_group_queue_;
     std::queue<std::function<void()>> command_group_queuePrev_;
+
 };
 
 }  // namespace lunatic_engine

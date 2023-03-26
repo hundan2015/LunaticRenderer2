@@ -85,6 +85,7 @@ class ResourceCore {
             res->children.emplace_back(
                 DFSMeshInfo(child, counter, mesh_list, mesh_dir));
         }
+
         return res;
     }
 };

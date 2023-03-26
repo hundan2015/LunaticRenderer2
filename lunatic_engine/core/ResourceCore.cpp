@@ -140,7 +140,9 @@ lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
     auto draw_mode = GL_STATIC_DRAW;
     // TODO: Add some options to make Mesh support skeleton.
     auto get_mesh_vao_command = [&]() {
-        glGenVertexArrays(1, &vao);
+        unsigned int vao_co;
+        glGenVertexArrays(1, &vao_co);
+        vao = vao_co;
         glGenBuffers(1, &vbo);
         glGenBuffers(1, &ebo);
         // bind the Vertex Array Object first, then bind and set vertex

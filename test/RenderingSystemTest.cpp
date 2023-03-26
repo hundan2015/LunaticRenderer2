@@ -1,3 +1,4 @@
+#include <barrier>
 #include <iostream>
 #include <memory>
 #include <thread>
@@ -28,7 +29,7 @@ int main() {
     std::thread tick_thread([&]() {
         // rendering_core->InsertRenderCommandGroup(render_command_test);
         {
-            lunatic_engine::ModelEntityFactory model_entity_factory;
+            /*lunatic_engine::ModelEntityFactory model_entity_factory;
             model_entity_factory.resource_core = resource_core;
 
             std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
@@ -42,8 +43,8 @@ int main() {
             lunatic_engine::ImageContent temp_image_content =
                 resource_core->GetImageContent("assets/Textures/Chess.jpg");
 
-            /*std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node
-               = assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");*/
+            *//*std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node
+               = assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");*//*
             auto mesh_info =
                 resource_core->GetMeshInfo("assets/Models/nanosuit.obj");
             // TODO: The model entity has no infomation! Need to add some
@@ -53,7 +54,7 @@ int main() {
                 std::make_shared<lunatic_engine::ImageContent>(
                     temp_image_content),
                 0);
-
+*/
             // mesh_node.reset();
             //  Make a main camera entity.
             std::shared_ptr<lunatic_engine::MainCamera> main_camera_ptr =
@@ -82,24 +83,50 @@ int main() {
 
             lunatic_engine::RegistryStation* registry_station =
                 lunatic_engine::RegistryStation::GetRegistryStation();
-            lunatic_engine::EntityMeta entity_meta =
-                registry_station->GetEntityMeta(entity);
-            json entity_json = entity_meta;
+            /* lunatic_engine::EntityMeta entity_meta =
+                 registry_station->GetEntityMeta(entity);*/
+            // json entity_json = entity_meta;
+            json entity_json;
+            std::ifstream json_file;
+            json_file.open("shit.json");
+            // json_file << entity_json;
+            std::stringstream json_info;
+            json_info << json_file.rdbuf();
+            std::string json_res = json_info.str();
+            entity_json = json::parse(json_res);
+
             std::cout << entity_json << std::endl;
+            lunatic_engine::EntityMeta entity_meta = entity_json;
             auto entity_cp = registry_station->GetEntity(entity_meta);
             entity_manager.RegisterEntitiesToSystem(entity_cp);
             // rendering_system.RegisterToSystem(entity);
         }
     });
     // Simulate the Lunatic Gaming Context.
+    std::barrier bar(2, []() noexcept {});
+    auto logicDeco = [&]() {
+        while (rendering_core->IsRenderEnabled()) {
+            bar.arrive_and_wait();
+            camera_system.OnTick(1);
+            rendering_system->OnTick(1);
+
+        }
+    };
+
+    std::thread logic(logicDeco);
+    //std::thread resource(resourceDeco);
+
     while (rendering_core->IsRenderEnabled()) {
         // TODO: Make a lunatic engine.
-        camera_system.OnTick(1);
-        rendering_system->OnTick(1);
+
         rendering_core->RenderTick();
         rendering_core->SwapRenderingQueue();
+
+        bar.arrive_and_wait();
     }
 
     tick_thread.join();
+    // resource.join();
+    logic.join();
     std::cout << "Rendering system test.\n";
 }
