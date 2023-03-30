@@ -20,7 +20,7 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
          * expose to the function layer.
          */
         lunatic_engine::MeshContent mesh_content =
-            resource_core->GetMeshContent(*(mesh_node->mesh));
+            resource_core->GetMeshContent(*(mesh_node->mesh), false);
         mesh->mesh_content = std::make_shared<MeshContent>(mesh_content);
         mesh->mesh_num = mesh_counter;
         mesh_counter++;

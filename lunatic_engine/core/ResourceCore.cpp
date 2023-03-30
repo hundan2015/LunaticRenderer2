@@ -114,7 +114,7 @@ void lunatic_engine::ResourceCore::CheckCompileErrors(GLuint shader,
     }
 }
 lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
-    lunatic_engine::model_loader::Mesh mesh) {
+    model_loader::Mesh mesh, bool is_instant = false) {
     std::atomic<bool> is_good = false;
     // bool is_good = false;
     unsigned int vao;
@@ -172,12 +172,18 @@ lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
         std::cout << "Created VAO:" << vao << std::endl;
         is_good = true;
     };
+    if(!is_instant){
+        rendering_core->InsertResoureCommandGroup(get_mesh_vao_command);
+        // A kind of barrier, like future.
+        while (!is_good)
+            ;
+    }else{
+        //TODO:Need a thread detection. If the mesh content getter not in the rendering thread, the result are not available.
+        get_mesh_vao_command();
+    }
     // The lambda is a kind of resource command, which must be pushed into
     // the rendering loop to interact with GLAD.
-    rendering_core->InsertResoureCommandGroup(get_mesh_vao_command);
-    // A kind of barrier, like future.
-    while (!is_good)
-        ;
+
     MeshContent res{};
     res.triangle_count = mesh.triangle_count;
     std::cout << "Having VAO:" << vao << std::endl;
@@ -248,4 +254,48 @@ lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
     image_content_map_.insert(std::make_pair(image_dir, image_content_ptr));
     image_content_map_mutex_.unlock();
     return result;
+}
+std::shared_ptr<lunatic_engine::MeshInfo> lunatic_engine::ResourceCore::GetMeshInfo(
+    std::string model_dir) {
+    {
+        std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
+        auto find_result = mesh_info_map_.find(model_dir);
+        if (find_result != mesh_info_map_.end()) {
+            return find_result->second;
+        }
+    }
+    auto mesh_node_root = assimp_loader.GetMeshNode(model_dir);
+    int counter = 0;
+    auto result = std::make_shared<MeshInfo>();
+    result->mesh_dir = model_dir;
+    auto root =
+        DFSMeshInfo(mesh_node_root, counter, result->mesh_list, model_dir);
+    result->root = root;
+    {
+        std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
+        mesh_info_map_.insert(std::make_pair(model_dir, result));
+    }
+    return result;
+}
+std::shared_ptr<lunatic_engine::MeshContentNode> lunatic_engine::ResourceCore::DFSMeshInfo(
+    std::shared_ptr<model_loader::MeshNode>& mesh_node, int& counter,
+    std::vector<std::shared_ptr<MeshContent>>& mesh_list,
+    const std::string& mesh_dir) {
+    auto res = std::make_shared<MeshContentNode>();
+
+    if (mesh_node->mesh) {
+        res->num = counter;
+        counter++;
+        res->mesh_content = std::make_shared<MeshContent>(
+            GetMeshContent(*(mesh_node->mesh), false));
+        res->mesh_dir = mesh_dir;
+        mesh_list.emplace_back(res->mesh_content);
+    }
+
+    for (auto child : mesh_node->child) {
+        res->children.emplace_back(
+            DFSMeshInfo(child, counter, mesh_list, mesh_dir));
+    }
+
+    return res;
 }

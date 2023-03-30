@@ -42,52 +42,14 @@ class ResourceCore {
      */
     static void CheckCompileErrors(GLuint shader, const std::string& type);
 
-    MeshContent GetMeshContent(model_loader::Mesh mesh);
+    MeshContent GetMeshContent(model_loader::Mesh mesh, bool is_instant);
     ImageContent GetImageContent(const std::string& image_dir);
 
-    std::shared_ptr<MeshInfo> GetMeshInfo(std::string model_dir) {
-        {
-            std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
-            auto find_result = mesh_info_map_.find(model_dir);
-            if (find_result != mesh_info_map_.end()) {
-                return find_result->second;
-            }
-        }
-        auto mesh_node_root = assimp_loader.GetMeshNode(model_dir);
-        int counter = 0;
-        auto result = std::make_shared<MeshInfo>();
-        result->mesh_dir = model_dir;
-        auto root =
-            DFSMeshInfo(mesh_node_root, counter, result->mesh_list, model_dir);
-        result->root = root;
-        {
-            std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
-            mesh_info_map_.insert(std::make_pair(model_dir, result));
-        }
-        return result;
-    }
+    std::shared_ptr<MeshInfo> GetMeshInfo(std::string model_dir);
     std::shared_ptr<MeshContentNode> DFSMeshInfo(
         std::shared_ptr<model_loader::MeshNode>& mesh_node, int& counter,
         std::vector<std::shared_ptr<MeshContent>>& mesh_list,
-        const std::string& mesh_dir) {
-        auto res = std::make_shared<MeshContentNode>();
-
-        if (mesh_node->mesh) {
-            res->num = counter;
-            counter++;
-            res->mesh_content = std::make_shared<MeshContent>(
-                GetMeshContent(*(mesh_node->mesh)));
-            res->mesh_dir = mesh_dir;
-            mesh_list.emplace_back(res->mesh_content);
-        }
-
-        for (auto child : mesh_node->child) {
-            res->children.emplace_back(
-                DFSMeshInfo(child, counter, mesh_list, mesh_dir));
-        }
-
-        return res;
-    }
+        const std::string& mesh_dir);
 };
 
 }  // namespace lunatic_engine
