@@ -19,9 +19,9 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
          * assimpLoader::mesh content should get in the resource core, and not
          * expose to the function layer.
          */
-        lunatic_engine::MeshContent mesh_content =
-            resource_core->GetMeshContent(*(mesh_node->mesh));
-        mesh->mesh_content = std::make_shared<MeshContent>(mesh_content);
+        auto mesh_content =
+            resource_core->GetMeshContent(*(mesh_node->mesh), false);
+        mesh->mesh_content = mesh_content;
         mesh->mesh_num = mesh_counter;
         mesh_counter++;
         entity_root->AddComponent<Mesh>(mesh);

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <iostream>
+#include <set>
 #include <sstream>
 #include "AssimpLoader.h"
 #include "RenderingCore.h"
@@ -9,7 +10,6 @@
 #include "fstream"
 #include "glad/glad.h"
 #include "map"
-
 namespace lunatic_engine {
 
 class ResourceCore {
@@ -21,6 +21,15 @@ class ResourceCore {
     std::map<std::string, std::shared_ptr<ShaderContent>> shader_content_map_;
     lunatic_engine::model_loader::AssimpLoader assimp_loader;
 
+    std::set<std::string> image_content_wait_set_;
+    std::mutex image_content_wait_set_mutex_;
+
+    std::set<std::string> shader_content_wait_set_;
+    std::mutex shader_content_wait_set_mutex_;
+
+    std::set<std::string> mesh_info_wait_set_;
+    std::mutex mesh_info_wait_set_mutex_;
+
    public:
     std::shared_ptr<RenderingCore> rendering_core;
     /**
@@ -30,8 +39,9 @@ class ResourceCore {
      * @brief Get shader context from the shader dir.
      */
     [[nodiscard]] std::shared_ptr<lunatic_engine::ShaderContent>
-    GetShaderContent(const std::string& vertex_shader_dir,
-                     const std::string& fragment_shader_dir);
+    GetShaderContent(const std::string vertex_shader_dir,
+                     const std::string fragment_shader_dir,
+                     bool is_instant = false);
     static std::string GetShaderFileString(const std::string& shader_dir);
     /**
      *
@@ -42,52 +52,16 @@ class ResourceCore {
      */
     static void CheckCompileErrors(GLuint shader, const std::string& type);
 
-    MeshContent GetMeshContent(model_loader::Mesh mesh);
-    ImageContent GetImageContent(const std::string& image_dir);
+    std::shared_ptr<lunatic_engine::MeshContent> GetMeshContent(
+        lunatic_engine::model_loader::Mesh mesh, bool is_instant = false);
+    std::shared_ptr<lunatic_engine::ImageContent> GetImageContent(
+        const std::string& image_dir, bool is_in_rendering = false);
 
-    std::shared_ptr<MeshInfo> GetMeshInfo(std::string model_dir) {
-        {
-            std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
-            auto find_result = mesh_info_map_.find(model_dir);
-            if (find_result != mesh_info_map_.end()) {
-                return find_result->second;
-            }
-        }
-        auto mesh_node_root = assimp_loader.GetMeshNode(model_dir);
-        int counter = 0;
-        auto result = std::make_shared<MeshInfo>();
-        result->mesh_dir = model_dir;
-        auto root =
-            DFSMeshInfo(mesh_node_root, counter, result->mesh_list, model_dir);
-        result->root = root;
-        {
-            std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
-            mesh_info_map_.insert(std::make_pair(model_dir, result));
-        }
-        return result;
-    }
+    std::shared_ptr<MeshInfo> GetMeshInfo(std::string model_dir);
     std::shared_ptr<MeshContentNode> DFSMeshInfo(
         std::shared_ptr<model_loader::MeshNode>& mesh_node, int& counter,
         std::vector<std::shared_ptr<MeshContent>>& mesh_list,
-        const std::string& mesh_dir) {
-        auto res = std::make_shared<MeshContentNode>();
-
-        if (mesh_node->mesh) {
-            res->num = counter;
-            counter++;
-            res->mesh_content = std::make_shared<MeshContent>(
-                GetMeshContent(*(mesh_node->mesh)));
-            res->mesh_dir = mesh_dir;
-            mesh_list.emplace_back(res->mesh_content);
-        }
-
-        for (auto child : mesh_node->child) {
-            res->children.emplace_back(
-                DFSMeshInfo(child, counter, mesh_list, mesh_dir));
-        }
-
-        return res;
-    }
+        const std::string& mesh_dir);
 };
 
 }  // namespace lunatic_engine

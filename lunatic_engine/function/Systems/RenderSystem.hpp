@@ -93,12 +93,19 @@ class RenderingSystem : public System {
                 }
                 auto mesh_info =
                     resource_share_ptr->GetMeshInfo(mesh->mesh_dir);
-                mesh->mesh_content = mesh_info->mesh_list[mesh->mesh_num];
+                if (mesh_info) {
+                    mesh->mesh_content = mesh_info->mesh_list[mesh->mesh_num];
+                } else {
+                    continue;
+                }
             }
             if (material->shader_content == nullptr) {
-                material->shader_content =
-                    resource_core.lock()->GetShaderContent(
-                        material->shader_vs_dir, material->shader_fs_dir);
+                auto shader_content = resource_core.lock()->GetShaderContent(
+                    material->shader_vs_dir, material->shader_fs_dir, true);
+                if (!shader_content) {
+                    continue;
+                }
+                material->shader_content = shader_content;
             }
             if (material->name_image_content_map.empty()) {
                 // TODO:TEST here!
@@ -110,9 +117,12 @@ class RenderingSystem : public System {
                 for (auto& name : material->name_dir_map) {
                     auto image_content =
                         resource_share_ptr->GetImageContent(name.second);
-                    material->name_image_content_map.insert(std::make_pair(
-                        name.first,
-                        std::make_shared<ImageContent>(image_content)));
+                    if (image_content) {
+                        material->name_image_content_map.insert(
+                            std::make_pair(name.first, image_content));
+                    } else {
+                        continue;
+                    }
                 }
             }
             // Because an Entity have only a weak_ptr parent, which can't be

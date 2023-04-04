@@ -9,23 +9,28 @@
 #include <atomic>
 #include <thread>
 #include "stb_image.h"
+namespace lunatic_engine {
+
 std::shared_ptr<lunatic_engine::ShaderContent>
 lunatic_engine::ResourceCore::GetShaderContent(
-    const std::string& vertex_shader_dir,
-    const std::string& fragment_shader_dir) {
-    std::string vertex_shader_source;
+    const std::string vertex_shader_dir, const std::string fragment_shader_dir,
+    bool is_instant) {
     std::string shader_id = vertex_shader_dir + "||" + fragment_shader_dir;
     {
         std::lock_guard lock_guard(shader_content_map_mutex_);
         auto result = shader_content_map_.find(shader_id);
         if (result != shader_content_map_.end()) {
+            {
+                auto shader_content_wait_lock_guard =
+                    std::lock_guard(shader_content_wait_set_mutex_);
+                if (shader_content_wait_set_.find(shader_id) !=
+                    shader_content_wait_set_.end()) {
+                    shader_content_wait_set_.erase(shader_id);
+                }
+            }
             return result->second;
         }
     }
-    vertex_shader_source = GetShaderFileString(vertex_shader_dir);
-
-    std::string fragment_shader_source;
-    fragment_shader_source = GetShaderFileString(fragment_shader_dir);
 
     std::shared_ptr<ShaderContent> shader_content =
         std::make_shared<ShaderContent>();
@@ -33,6 +38,11 @@ lunatic_engine::ResourceCore::GetShaderContent(
 
     unsigned int shader_program;
     auto create_shader_source = [=, &is_good, &shader_program]() mutable {
+        std::string vertex_shader_source;
+        vertex_shader_source = GetShaderFileString(vertex_shader_dir);
+
+        std::string fragment_shader_source;
+        fragment_shader_source = GetShaderFileString(fragment_shader_dir);
         unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
         const char* shit1 = vertex_shader_source.c_str();
         const char* shit2 = fragment_shader_source.c_str();
@@ -58,20 +68,40 @@ lunatic_engine::ResourceCore::GetShaderContent(
         // return a content.
         is_good = true;
     };
-    rendering_core->InsertResoureCommandGroup(create_shader_source);
-    // Kind of barrier.
-    while (!is_good) {
-        // TODO:Here should have a lock. Kind of PV operation. If we don't do
-        // so, the content would be get earlier than it has been spawned.
-        // std::this_thread::yield();
+    if (!is_instant) {
+        rendering_core->InsertResoureCommandGroup(create_shader_source);
+        // Kind of barrier.
+        while (!is_good) {
+            // TODO:Here should have a lock. Kind of PV operation. If we don't
+            // do so, the content would be get earlier than it has been spawned.
+            // std::this_thread::yield();
+        }
+    } else {
+        auto get_shader_content = [=, &create_shader_source]() {
+            create_shader_source();
+            auto shader_content = std::make_shared<ShaderContent>();
+            shader_content->vertex_shader_dir = vertex_shader_dir;
+            shader_content->fragment_shader_dir = fragment_shader_dir;
+            shader_content->shader_program = shader_program;
+            {
+                std::lock_guard lock_guard(shader_content_map_mutex_);
+                shader_content_map_.insert(
+                    std::make_pair(shader_id, shader_content));
+            }
+        };
+        {
+            auto shader_content_wait_lock_guard =
+                std::lock_guard(shader_content_wait_set_mutex_);
+            if (shader_content_wait_set_.find(shader_id) ==
+                shader_content_wait_set_.end()) {
+                shader_content_wait_set_.insert(shader_id);
+                rendering_core->InsertResoureCommandGroup(get_shader_content);
+            }
+        }
+
+        // TODO:Here have some bug!
     }
-    shader_content->vertex_shader_dir = vertex_shader_dir;
-    shader_content->fragment_shader_dir = fragment_shader_dir;
-    shader_content->shader_program = shader_program;
-    {
-        std::lock_guard lock_guard(shader_content_map_mutex_);
-        shader_content_map_.insert(std::make_pair(shader_id, shader_content));
-    }
+
     return shader_content;
 }
 std::string lunatic_engine::ResourceCore::GetShaderFileString(
@@ -113,8 +143,9 @@ void lunatic_engine::ResourceCore::CheckCompileErrors(GLuint shader,
         }
     }
 }
-lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
-    lunatic_engine::model_loader::Mesh mesh) {
+std::shared_ptr<lunatic_engine::MeshContent>
+lunatic_engine::ResourceCore::GetMeshContent(
+    lunatic_engine::model_loader::Mesh mesh, bool is_instant) {
     std::atomic<bool> is_good = false;
     // bool is_good = false;
     unsigned int vao;
@@ -174,18 +205,23 @@ lunatic_engine::MeshContent lunatic_engine::ResourceCore::GetMeshContent(
     };
     // The lambda is a kind of resource command, which must be pushed into
     // the rendering loop to interact with GLAD.
-    rendering_core->InsertResoureCommandGroup(get_mesh_vao_command);
-    // A kind of barrier, like future.
-    while (!is_good)
-        ;
+    if (!is_instant) {
+        rendering_core->InsertResoureCommandGroup(get_mesh_vao_command);
+        // A kind of barrier, like future.
+        while (!is_good)
+            ;
+    } else {
+        get_mesh_vao_command();
+    }
     MeshContent res{};
     res.triangle_count = mesh.triangle_count;
     std::cout << "Having VAO:" << vao << std::endl;
     res.vao = vao;
-    return res;
+    return std::make_shared<MeshContent>(res);
 }
-lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
-    const std::string& image_dir) {
+std::shared_ptr<lunatic_engine::ImageContent>
+lunatic_engine::ResourceCore::GetImageContent(const std::string& image_dir,
+                                              bool is_in_rendering) {
     // The brace is necessary! To use the lock guard auto free the lock!
     {
         std::lock_guard lock_guard(image_content_map_mutex_);
@@ -193,59 +229,148 @@ lunatic_engine::ImageContent lunatic_engine::ResourceCore::GetImageContent(
         auto search_result = image_content_map_.find(image_dir);
 
         if (search_result != image_content_map_.end()) {
-            return *(search_result->second);
+            {
+                auto image_content_wait_lock_guard =
+                    std::lock_guard(image_content_wait_set_mutex_);
+                if (image_content_wait_set_.find(image_dir) !=
+                    image_content_wait_set_.end()) {
+                    image_content_wait_set_.erase(image_dir);
+                }
+            }
+            return (search_result->second);
         }
     }
 
-    // The content's first load.
-    unsigned int texture;
-    std::atomic<bool> is_texture_ok = false;
-    auto get_texture_content = [=, &texture, &is_texture_ok]() {
-        int width;
-        int height;
-        int nr_channel;
-        unsigned char* data = nullptr;
-        const char* directory_str = image_dir.c_str();
-        data = stbi_load(directory_str, &width, &height, &nr_channel, 0);
-        assert(data != nullptr);
-        if (data == nullptr) {
-            std::cout << "The texture failed ot load!\n";
+    auto registry_texture = [&]() {
+        // The content's first load.
+        unsigned int texture;
+        std::atomic<bool> is_texture_ok = false;
+        auto get_texture_content = [=, &texture, &is_texture_ok]() {
+            int width;
+            int height;
+            int nr_channel;
+            unsigned char* data = nullptr;
+            const char* directory_str = image_dir.c_str();
+            data = stbi_load(directory_str, &width, &height, &nr_channel, 0);
+            assert(data != nullptr);
+            if (data == nullptr) {
+                std::cout << "The texture failed ot load!\n";
+            } else {
+                std::cout << "Loaded texture." << std::endl;
+            }
+            // Final I found this fucking mistake! In the previous version
+            // it can't pass the value to the texture. So the texture is
+            // fucking black!
+            auto texture_plus = texture;
+            // Don't try to get texture's address!
+            glGenTextures(1, &texture_plus);
+            std::cout << "Texture id" << texture_plus << std::endl;
+            glBindTexture(GL_TEXTURE_2D, texture_plus);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                            GL_LINEAR_MIPMAP_LINEAR);
+
+            // glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                         GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            stbi_image_free(data);
+            texture = texture_plus;
+            is_texture_ok = true;
+        };
+        if (!is_in_rendering) {
+            rendering_core->InsertResoureCommandGroup(get_texture_content);
+            while (!is_texture_ok)
+                ;
         } else {
-            std::cout << "Loaded texture." << std::endl;
+            get_texture_content();
         }
-        // Final I found this fucking mistake! In the previous version
-        // it can't pass the value to the texture. So the texture is
-        // fucking black!
-        auto texture_plus = texture;
-        // Don't try to get texture's address!
-        glGenTextures(1, &texture_plus);
-        std::cout << "Texture id" << texture_plus << std::endl;
-        glBindTexture(GL_TEXTURE_2D, texture_plus);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                        GL_LINEAR_MIPMAP_LINEAR);
+        ImageContent result(texture);
+        result.image_dir = image_dir;
+        std::shared_ptr<ImageContent> image_content_ptr =
+            std::make_shared<ImageContent>(result);
 
-        // glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                     GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        stbi_image_free(data);
-        texture = texture_plus;
-        is_texture_ok = true;
+        image_content_map_mutex_.lock();
+        image_content_map_.insert(std::make_pair(image_dir, image_content_ptr));
+        image_content_map_mutex_.unlock();
     };
-    rendering_core->InsertResoureCommandGroup(get_texture_content);
-    while (!is_texture_ok)
-        ;
-    ImageContent result(texture);
-    result.image_dir = image_dir;
-    std::shared_ptr<ImageContent> image_content_ptr =
-        std::make_shared<ImageContent>(result);
-
-    image_content_map_mutex_.lock();
-    image_content_map_.insert(std::make_pair(image_dir, image_content_ptr));
-    image_content_map_mutex_.unlock();
-    return result;
+    if (is_in_rendering) {
+        auto image_content_wait_lock_guard =
+            std::lock_guard(image_content_wait_set_mutex_);
+        if (image_content_wait_set_.find(image_dir) ==
+            image_content_wait_set_.end()) {
+            rendering_core->InsertResoureCommandGroup(registry_texture);
+            image_content_wait_set_.insert(image_dir);
+        }
+    } else {
+        registry_texture();
+    }
+    return nullptr;
 }
+std::shared_ptr<MeshInfo> lunatic_engine::ResourceCore::GetMeshInfo(
+    std::string model_dir) {
+    {
+        std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
+
+        auto find_result = mesh_info_map_.find(model_dir);
+        if (find_result != mesh_info_map_.end()) {
+            {
+                auto mesh_wait_set_lock_guard =
+                    std::lock_guard(mesh_info_wait_set_mutex_);
+                if (mesh_info_wait_set_.find(model_dir) !=
+                    mesh_info_wait_set_.end()) {
+                    mesh_info_wait_set_.erase(model_dir);
+                }
+            }
+            return find_result->second;
+        }
+    }
+    auto get_mesh_info = [=]() {
+        auto mesh_node_root = assimp_loader.GetMeshNode(model_dir);
+        int counter = 0;
+        auto result = std::make_shared<MeshInfo>();
+        result->mesh_dir = model_dir;
+        auto root =
+            DFSMeshInfo(mesh_node_root, counter, result->mesh_list, model_dir);
+        result->root = root;
+        {
+            std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
+            mesh_info_map_.insert(std::make_pair(model_dir, result));
+        }
+    };
+    {
+        auto mesh_wait_set_lock_guard =
+            std::lock_guard(mesh_info_wait_set_mutex_);
+        if (mesh_info_wait_set_.find(model_dir) == mesh_info_wait_set_.end()) {
+            mesh_info_wait_set_.insert(model_dir);
+            rendering_core->InsertResoureCommandGroup(get_mesh_info);
+        }
+    }
+    return nullptr;
+}
+std::shared_ptr<MeshContentNode> lunatic_engine::ResourceCore::DFSMeshInfo(
+    std::shared_ptr<model_loader::MeshNode>& mesh_node, int& counter,
+    std::vector<std::shared_ptr<MeshContent>>& mesh_list,
+    const std::string& mesh_dir) {
+    auto res = std::make_shared<MeshContentNode>();
+
+    if (mesh_node->mesh) {
+        res->num = counter;
+        counter++;
+        res->mesh_content = GetMeshContent(*(mesh_node->mesh), true);
+        res->mesh_dir = mesh_dir;
+        mesh_list.emplace_back(res->mesh_content);
+    }
+
+    for (auto child : mesh_node->child) {
+        res->children.emplace_back(
+            DFSMeshInfo(child, counter, mesh_list, mesh_dir));
+    }
+
+    return res;
+}
+}  // namespace lunatic_engine
