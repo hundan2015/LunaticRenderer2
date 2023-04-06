@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <iostream>
-#include <set>
 #include <sstream>
 #include "AssimpLoader.h"
 #include "RenderingCore.h"
@@ -10,6 +9,7 @@
 #include "fstream"
 #include "glad/glad.h"
 #include "map"
+
 namespace lunatic_engine {
 
 class ResourceCore {
@@ -21,15 +21,6 @@ class ResourceCore {
     std::map<std::string, std::shared_ptr<ShaderContent>> shader_content_map_;
     lunatic_engine::model_loader::AssimpLoader assimp_loader;
 
-    std::set<std::string> image_content_wait_set_;
-    std::mutex image_content_wait_set_mutex_;
-
-    std::set<std::string> shader_content_wait_set_;
-    std::mutex shader_content_wait_set_mutex_;
-
-    std::set<std::string> mesh_info_wait_set_;
-    std::mutex mesh_info_wait_set_mutex_;
-
    public:
     std::shared_ptr<RenderingCore> rendering_core;
     /**
@@ -39,9 +30,8 @@ class ResourceCore {
      * @brief Get shader context from the shader dir.
      */
     [[nodiscard]] std::shared_ptr<lunatic_engine::ShaderContent>
-    GetShaderContent(const std::string vertex_shader_dir,
-                     const std::string fragment_shader_dir,
-                     bool is_instant = false);
+    GetShaderContent(const std::string& vertex_shader_dir,
+                     const std::string& fragment_shader_dir);
     static std::string GetShaderFileString(const std::string& shader_dir);
     /**
      *
@@ -52,10 +42,8 @@ class ResourceCore {
      */
     static void CheckCompileErrors(GLuint shader, const std::string& type);
 
-    std::shared_ptr<lunatic_engine::MeshContent> GetMeshContent(
-        lunatic_engine::model_loader::Mesh mesh, bool is_instant = false);
-    std::shared_ptr<lunatic_engine::ImageContent> GetImageContent(
-        const std::string& image_dir, bool is_in_rendering = false);
+    std::shared_ptr<MeshContent> GetMeshContent(model_loader::Mesh mesh);
+    std::shared_ptr<ImageContent> GetImageContent(const std::string& image_dir);
 
     std::shared_ptr<MeshInfo> GetMeshInfo(std::string model_dir);
     std::shared_ptr<MeshContentNode> DFSMeshInfo(
