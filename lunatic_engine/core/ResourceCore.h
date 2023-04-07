@@ -9,6 +9,7 @@
 #include "fstream"
 #include "glad/glad.h"
 #include "map"
+#include "set"
 
 namespace lunatic_engine {
 
@@ -21,17 +22,24 @@ class ResourceCore {
     std::map<std::string, std::shared_ptr<ShaderContent>> shader_content_map_;
     lunatic_engine::model_loader::AssimpLoader assimp_loader;
 
+    std::set<std::string> mesh_info_wait_set_;
+    std::mutex mesh_info_wait_mutex_;
+    std::set<std::string> image_content_wait_set_;
+    std::mutex image_content_wait_mutex_;
+    std::set<std::string> shader_content_wait_set_;
+    std::mutex shader_content_wait_mutex_;
+
    public:
     std::shared_ptr<RenderingCore> rendering_core;
     /**
-     * @param vertex_shader_dir Vertex shader's dir.
+     * @param shader_content_map_mutex Vertex shader's dir.
      * @param fragment_shader_dir Fragment shader's dir.
      * @return The shader content created by core.
      * @brief Get shader context from the shader dir.
      */
-    [[nodiscard]] std::shared_ptr<lunatic_engine::ShaderContent>
-    GetShaderContent(const std::string& vertex_shader_dir,
-                     const std::string& fragment_shader_dir);
+    std::shared_ptr<lunatic_engine::ShaderContent> GetShaderContent(
+        const std::string shader_content_map_mutex,
+        const std::string fragment_shader_dir, bool is_immediatly);
     static std::string GetShaderFileString(const std::string& shader_dir);
     /**
      *
@@ -42,11 +50,13 @@ class ResourceCore {
      */
     static void CheckCompileErrors(GLuint shader, const std::string& type);
 
-    std::shared_ptr<MeshContent> GetMeshContent(model_loader::Mesh mesh);
-    std::shared_ptr<ImageContent> GetImageContent(const std::string& image_dir,
-                                                  bool is_immediatly = false);
+    std::shared_ptr<MeshContent> GetMeshContent(
+        std::shared_ptr<model_loader::Mesh> mesh, bool is_blocking = false);
+    std::shared_ptr<ImageContent> GetImageContent(
+        const std::string& image_content_map_mutex, bool is_immediatly = true);
 
-    std::shared_ptr<MeshInfo> GetMeshInfo(std::string model_dir);
+    std::shared_ptr<MeshInfo> GetMeshInfo(const std::string model_dir,
+                                          bool is_immediatly);
     std::shared_ptr<MeshContentNode> DFSMeshInfo(
         std::shared_ptr<model_loader::MeshNode>& mesh_node, int& counter,
         std::vector<std::shared_ptr<MeshContent>>& mesh_list,

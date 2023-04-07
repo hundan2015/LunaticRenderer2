@@ -78,13 +78,16 @@ class RenderingSystem : public System {
     }
     void OnTick(float deltaTime) override {
         std::cout << "Rendering system is ticking." << deltaTime << std::endl;
+        bool is_ready_to_rendering;
         for (const auto& entity : targets_) {
             if (!IsEntityEnabled(entity)) continue;
             std::shared_ptr<Mesh> mesh = entity->GetComponent<Mesh>();
             std::shared_ptr<Material> material =
                 entity->GetComponent<Material>();
             // Init Mesh and material component.
+            is_ready_to_rendering = true;
             if (mesh->mesh_content == nullptr) {
+                is_ready_to_rendering = false;
                 // TODO: make a mesh content getter.
                 auto resource_share_ptr = resource_core.lock();
                 if (!resource_share_ptr) {
@@ -92,15 +95,23 @@ class RenderingSystem : public System {
                     abort();
                 }
                 auto mesh_info =
-                    resource_share_ptr->GetMeshInfo(mesh->mesh_dir);
-                mesh->mesh_content = mesh_info->mesh_list[mesh->mesh_num];
+                    resource_share_ptr->GetMeshInfo(mesh->mesh_dir, false);
+                if (mesh_info)
+                    mesh->mesh_content = mesh_info->mesh_list[mesh->mesh_num];
             }
             if (material->shader_content == nullptr) {
-                material->shader_content =
-                    resource_core.lock()->GetShaderContent(
-                        material->shader_vs_dir, material->shader_fs_dir);
+                is_ready_to_rendering = false;
+                auto resource_share_ptr = resource_core.lock();
+                if (!resource_share_ptr) {
+                    std::cout << "ERROR::Resource core fucked up!";
+                    abort();
+                }
+                material->shader_content = resource_share_ptr->GetShaderContent(
+                    material->shader_vs_dir, material->shader_fs_dir, false);
             }
-            if (material->name_image_content_map.empty()) {
+            if (material->name_image_content_map.size() !=
+                material->name_dir_map.size()) {
+                is_ready_to_rendering = false;
                 // TODO:TEST here!
                 auto resource_share_ptr = resource_core.lock();
                 if (!resource_share_ptr) {
@@ -108,12 +119,20 @@ class RenderingSystem : public System {
                     abort();
                 }
                 for (auto& name : material->name_dir_map) {
+                    if (material->name_image_content_map.find(name.first) !=
+                        material->name_image_content_map.end()) {
+                        continue;
+                    }
                     auto image_content =
-                        resource_share_ptr->GetImageContent(name.second, true);
-                    material->name_image_content_map.insert(
-                        std::make_pair(name.first, image_content));
+                        resource_share_ptr->GetImageContent(name.second, false);
+                    if(image_content){
+                        material->name_image_content_map.insert(
+                            std::make_pair(name.first, image_content));
+                    }
+
                 }
             }
+            if (!is_ready_to_rendering) continue;
             // Because an Entity have only a weak_ptr parent, which can't be
             // nullptr. So I transfer it into the shared_ptr first.
             std::shared_ptr<Entity> parent = entity->parent.lock();

@@ -20,7 +20,8 @@ std::shared_ptr<Entity> lunatic_engine::ModelEntityFactory::GetModelEntity(
          * expose to the function layer.
          */
 
-        mesh->mesh_content = resource_core->GetMeshContent(*(mesh_node->mesh));
+        mesh->mesh_content =
+            resource_core->GetMeshContent(mesh_node->mesh, false);
         mesh->mesh_num = mesh_counter;
         mesh_counter++;
         entity_root->AddComponent<Mesh>(mesh);
@@ -66,6 +67,8 @@ std::shared_ptr<Entity> ModelEntityFactory::GetModelEntity(
         material_ptr->shader_content = shader_content_ptr;
         // In this engine's default pipeline, we use _Albedo to describe the
         // diffuse map.
+        material_ptr->name_dir_map.insert(
+            std::make_pair("_Albedo", temp_image_content_->image_dir));
         material_ptr->name_image_content_map.insert(
             std::make_pair("_Albedo", temp_image_content_));
 
