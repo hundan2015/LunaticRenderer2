@@ -36,25 +36,12 @@ int main() {
             /**
              * Create entity.
              */
-            std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
-                resource_core->GetShaderContent(
-                    "assets/Shader/TriangleShader_vs.glsl",
-                    "assets/Shader/TriangleShader_fs.glsl", true);
-            // TODO: The Resource core should not only get the resource itself,
-            // but should also try to manage the resource.
-            std::cout << "ShaderProgram" << shader_content_ptr->shader_program
-                      << std::endl;
-            auto temp_image_content = resource_core->GetImageContent(
-                "assets/Textures/Chess.jpg", true);
 
-            std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node =
-                assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");
-            auto mesh_info =
-                resource_core->GetMeshInfo("assets/Models/nanosuit.obj", true);
-            // TODO: The model entity has no infomation! Need to add some
-            // mesh_dir,shader_dir,and image_dir
             auto entity = model_entity_factory.GetModelEntity(
-                mesh_info->root, shader_content_ptr, temp_image_content, 0);
+                "assets/Shader/TriangleShader_vs.glsl",
+                "assets/Shader/TriangleShader_fs.glsl",
+                "assets/Textures/Chess.jpg", "assets/Models/nanosuit.obj",
+                true);
             /**
              * Finished create entity.
              */
@@ -62,6 +49,8 @@ int main() {
                 registry_station->GetEntityMeta(entity);
             json entity_json_pre = entity_meta_pre;
             std::cout << entity_json_pre << std::endl;
+            /*std::ofstream entity_json_prev;
+            entity_json_prev.open()*/
 
             //  Make a main camera entity.
             std::shared_ptr<lunatic_engine::MainCamera> main_camera_ptr =

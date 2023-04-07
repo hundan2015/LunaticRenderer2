@@ -82,4 +82,29 @@ std::shared_ptr<Entity> ModelEntityFactory::GetModelEntity(
     }
     return entity_root;
 }
+std::shared_ptr<Entity> ModelEntityFactory::GetModelEntity(
+    std::string vertex_dir, std::string fragment_dir, std::string texture_dir,
+    std::string mesh_dir, bool is_immediatly) {
+    std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
+        resource_core->GetShaderContent(vertex_dir, fragment_dir,
+                                        is_immediatly);
+    // TODO: The Resource core should not only get the resource itself,
+    // but should also try to manage the resource.
+    if (is_immediatly) {
+        std::cout << "ShaderProgram" << shader_content_ptr->shader_program
+                  << std::endl;
+    }
+
+    auto temp_image_content =
+        resource_core->GetImageContent(texture_dir, is_immediatly);
+
+    /*std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node =
+        assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");*/
+    auto mesh_info = resource_core->GetMeshInfo(mesh_dir, is_immediatly);
+    // TODO: The model entity has no infomation! Need to add some
+    // mesh_dir,shader_dir,and image_dir
+    auto entity = GetModelEntity(mesh_info->root, shader_content_ptr,
+                                 temp_image_content, 0);
+    return entity;
+}
 }  // namespace lunatic_engine
