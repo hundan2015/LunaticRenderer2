@@ -109,7 +109,7 @@ class RenderingSystem : public System {
                 }
                 for (auto& name : material->name_dir_map) {
                     auto image_content =
-                        resource_share_ptr->GetImageContent(name.second);
+                        resource_share_ptr->GetImageContent(name.second, true);
                     material->name_image_content_map.insert(
                         std::make_pair(name.first, image_content));
                 }

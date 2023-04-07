@@ -187,7 +187,7 @@ std::shared_ptr<MeshContent> lunatic_engine::ResourceCore::GetMeshContent(
     return std::make_shared<MeshContent>(res);
 }
 std::shared_ptr<ImageContent> lunatic_engine::ResourceCore::GetImageContent(
-    const std::string& image_dir) {
+    const std::string& image_dir, bool is_immediatly) {
     // The brace is necessary! To use the lock guard auto free the lock!
     {
         std::lock_guard lock_guard(image_content_map_mutex_);
@@ -200,9 +200,12 @@ std::shared_ptr<ImageContent> lunatic_engine::ResourceCore::GetImageContent(
     }
 
     // The content's first load.
-    unsigned int texture;
-    std::atomic<bool> is_texture_ok = false;
-    auto get_texture_content = [=, &texture, &is_texture_ok]() {
+    std::shared_ptr<std::atomic<bool>> is_texture_ok =
+        std::make_shared<std::atomic_bool>(false);
+    std::shared_ptr<std::shared_ptr<ImageContent>> image_result_ptr;
+
+    auto get_texture_content = [=]() {
+        unsigned int texture;
         int width;
         int height;
         int nr_channel;
@@ -218,11 +221,10 @@ std::shared_ptr<ImageContent> lunatic_engine::ResourceCore::GetImageContent(
         // Final I found this fucking mistake! In the previous version
         // it can't pass the value to the texture. So the texture is
         // fucking black!
-        auto texture_plus = texture;
         // Don't try to get texture's address!
-        glGenTextures(1, &texture_plus);
-        std::cout << "Texture id" << texture_plus << std::endl;
-        glBindTexture(GL_TEXTURE_2D, texture_plus);
+        glGenTextures(1, &texture);
+        std::cout << "Texture id" << texture << std::endl;
+        glBindTexture(GL_TEXTURE_2D, texture);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -235,23 +237,28 @@ std::shared_ptr<ImageContent> lunatic_engine::ResourceCore::GetImageContent(
                      GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
         stbi_image_free(data);
-        texture = texture_plus;
-        is_texture_ok = true;
-    };
-    rendering_core->InsertResoureCommandGroup(get_texture_content);
-    while (!is_texture_ok)
-        ;
-    ImageContent result(texture);
-    result.image_dir = image_dir;
-    std::shared_ptr<ImageContent> image_content_ptr =
-        std::make_shared<ImageContent>(result);
 
-    image_content_map_mutex_.lock();
-    image_content_map_.insert(std::make_pair(image_dir, image_content_ptr));
-    image_content_map_mutex_.unlock();
-    return std::make_shared<ImageContent>(result);
+        ImageContent result(texture);
+        result.image_dir = image_dir;
+        std::shared_ptr<ImageContent> image_content_ptr =
+            std::make_shared<ImageContent>(result);
+
+        image_content_map_mutex_.lock();
+        image_content_map_.insert(std::make_pair(image_dir, image_content_ptr));
+        image_content_map_mutex_.unlock();
+        *image_result_ptr = image_content_ptr;
+        *is_texture_ok = true;
+    };
+
+    rendering_core->InsertResoureCommandGroup(get_texture_content);
+    if (is_immediatly) {
+        while (!(*is_texture_ok))
+            ;
+        return *image_result_ptr;
+    }
+    return nullptr;
 }
-std::shared_ptr<MeshInfo> ResourceCore::GetMeshInfo(std::string model_dir) {
+std::shared_ptr<MeshInfo> ResourceCore::GetMeshInfo(const std::string model_dir) {
     {
         std::lock_guard mesh_info_lock_guard(mesh_info_map_mutex_);
         auto find_result = mesh_info_map_.find(model_dir);

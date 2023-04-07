@@ -43,7 +43,8 @@ class ResourceCore {
     static void CheckCompileErrors(GLuint shader, const std::string& type);
 
     std::shared_ptr<MeshContent> GetMeshContent(model_loader::Mesh mesh);
-    std::shared_ptr<ImageContent> GetImageContent(const std::string& image_dir);
+    std::shared_ptr<ImageContent> GetImageContent(const std::string& image_dir,
+                                                  bool is_immediatly = false);
 
     std::shared_ptr<MeshInfo> GetMeshInfo(std::string model_dir);
     std::shared_ptr<MeshContentNode> DFSMeshInfo(
