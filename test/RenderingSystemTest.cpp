@@ -29,33 +29,40 @@ int main() {
     std::thread tick_thread([&]() {
         // rendering_core->InsertRenderCommandGroup(render_command_test);
         {
-            /*lunatic_engine::ModelEntityFactory model_entity_factory;
+            lunatic_engine::RegistryStation* registry_station =
+                lunatic_engine::RegistryStation::GetRegistryStation();
+            lunatic_engine::ModelEntityFactory model_entity_factory;
             model_entity_factory.resource_core = resource_core;
-
+            /**
+             * Create entity.
+             */
             std::shared_ptr<lunatic_engine::ShaderContent> shader_content_ptr =
                 resource_core->GetShaderContent(
                     "assets/Shader/TriangleShader_vs.glsl",
-                    "assets/Shader/TriangleShader_fs.glsl");
+                    "assets/Shader/TriangleShader_fs.glsl", true);
             // TODO: The Resource core should not only get the resource itself,
             // but should also try to manage the resource.
             std::cout << "ShaderProgram" << shader_content_ptr->shader_program
                       << std::endl;
-            lunatic_engine::ImageContent temp_image_content =
-                resource_core->GetImageContent("assets/Textures/Chess.jpg");
+            auto temp_image_content = resource_core->GetImageContent(
+                "assets/Textures/Chess.jpg", true);
 
-            *//*std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node
-               = assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");*//*
+            std::shared_ptr<lunatic_engine::model_loader::MeshNode> mesh_node =
+                assimp_loader.GetMeshNode("assets/Models/nanosuit.obj");
             auto mesh_info =
-                resource_core->GetMeshInfo("assets/Models/nanosuit.obj");
+                resource_core->GetMeshInfo("assets/Models/nanosuit.obj", true);
             // TODO: The model entity has no infomation! Need to add some
             // mesh_dir,shader_dir,and image_dir
             auto entity = model_entity_factory.GetModelEntity(
-                mesh_info->root, shader_content_ptr,
-                std::make_shared<lunatic_engine::ImageContent>(
-                    temp_image_content),
-                0);
-*/
-            // mesh_node.reset();
+                mesh_info->root, shader_content_ptr, temp_image_content, 0);
+            /**
+             * Finished create entity.
+             */
+            lunatic_engine::EntityMeta entity_meta_pre =
+                registry_station->GetEntityMeta(entity);
+            json entity_json_pre = entity_meta_pre;
+            std::cout << entity_json_pre << std::endl;
+
             //  Make a main camera entity.
             std::shared_ptr<lunatic_engine::MainCamera> main_camera_ptr =
                 std::make_shared<lunatic_engine::MainCamera>();
@@ -81,11 +88,6 @@ int main() {
 
             camera_system.RegisterToSystem(camera);
 
-            lunatic_engine::RegistryStation* registry_station =
-                lunatic_engine::RegistryStation::GetRegistryStation();
-            /* lunatic_engine::EntityMeta entity_meta =
-                 registry_station->GetEntityMeta(entity);*/
-            // json entity_json = entity_meta;
             json entity_json;
             std::ifstream json_file;
             json_file.open("shit.json");
@@ -109,12 +111,11 @@ int main() {
             bar.arrive_and_wait();
             camera_system.OnTick(1);
             rendering_system->OnTick(1);
-
         }
     };
 
     std::thread logic(logicDeco);
-    //std::thread resource(resourceDeco);
+    // std::thread resource(resourceDeco);
 
     while (rendering_core->IsRenderEnabled()) {
         // TODO: Make a lunatic engine.

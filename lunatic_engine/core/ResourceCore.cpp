@@ -84,7 +84,7 @@ std::shared_ptr<ShaderContent> ResourceCore::GetShaderContent(
     }
     // Kind of barrier.
     if (is_immediatly) {
-        while (!is_good) {
+        while (!(*is_good)) {
             // TODO:Here should have a lock. Kind of PV operation. If we don't
             // do so, the content would be get earlier than it has been spawned.
             // std::this_thread::yield();
